@@ -1,3 +1,4 @@
+
 #root {
   width: 100%;
   min-height: 100vh;
@@ -20,14 +21,64 @@ textarea:focus {
 }
 
 /* Cores e estilos específicos */
-.text-highlight {
+.text-tars-highlight {
   color: #10b981;
 }
 
-.bg-highlight {
+.bg-tars-highlight {
   background-color: #10b981;
 }
 
-.border-highlight {
+.border-tars-highlight {
   border-color: #10b981;
+}
+
+/* Estilos para cards selecionáveis */
+.tars-card {
+  position: relative;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  transition: all 0.2s ease-in-out;
+  background: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.tars-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.tars-card.selected {
+  border-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.tars-card.selected:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 20px 20px 0;
+  border-color: transparent #10b981 transparent transparent;
+}
+
+/* Estilos para botões de complexidade */
+.complexity-btn {
+  min-width: 85px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.complexity-btn:hover {
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.complexity-btn.selected {
+  border-color: #10b981;
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
 }

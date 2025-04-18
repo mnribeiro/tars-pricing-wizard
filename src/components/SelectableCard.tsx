@@ -9,6 +9,7 @@ interface SelectableCardProps {
   icon?: ReactNode;
   className?: string;
   price?: number;
+  showPrice?: boolean;
 }
 
 const SelectableCard = ({
@@ -17,13 +18,16 @@ const SelectableCard = ({
   onClick,
   icon,
   className,
-  price
+  price,
+  showPrice = false
 }: SelectableCardProps) => {
   return (
     <div
       className={cn(
-        "tars-card p-4 cursor-pointer animate-scale-in",
-        selected && "selected",
+        "border rounded-md p-4 cursor-pointer transition-all duration-200 animate-scale-in",
+        selected 
+          ? "border-tars-highlight bg-tars-highlight bg-opacity-10" 
+          : "border-border hover:border-tars-highlight/50",
         className
       )}
       onClick={onClick}
@@ -31,9 +35,9 @@ const SelectableCard = ({
       <div className="flex flex-col items-center justify-center gap-3 p-2">
         {icon && <div className="text-2xl">{icon}</div>}
         <h3 className="font-medium text-center">{title}</h3>
-        {price !== undefined && (
+        {showPrice && price !== undefined && (
           <p className="text-sm font-bold text-tars-highlight">
-            R$ {price.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
+            R$ {price.toLocaleString('pt-BR')}
           </p>
         )}
       </div>

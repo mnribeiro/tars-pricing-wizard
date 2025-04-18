@@ -5,18 +5,28 @@ import {
   BusinessNiche,
   AutomationObjective,
   AILevel,
+  AIFeature,
   Module,
   ModuleName,
   ComplexityLevel,
   businessNiches,
   automationObjectives,
-  aiLevels,
+  aiFeatures,
+  aiLevelThresholds,
   availableModules,
-  calculateTotalPrice
+  calculateTotalPrice,
+  generateImplementationTimeline
 } from "@/types/calculator";
 import SelectableCard from "./SelectableCard";
 import ComplexitySelector from "./ComplexitySelector";
-import { Building, Target, Brain, Database, MessageSquare, BarChart3, LayoutDashboard, BellRing, ClipboardList } from "lucide-react";
+import { 
+  Building, Target, Brain, Database, MessageSquare, BarChart3, 
+  LayoutDashboard, BellRing, ClipboardList, ShoppingCart, 
+  HeartPulse, Store, Handshake, Factory, Settings, 
+  TrendingUp, TrendingDown, Smile, Clock, ScanSearch,
+  Code, Smartphone, Globe, Users
+} from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const PricingCalculator = () => {
   // Referência para a seção de resumo para rolagem suave
@@ -29,6 +39,7 @@ const PricingCalculator = () => {
     selectedNiche: null,
     selectedObjective: null,
     selectedAILevel: null,
+    selectedAIFeatures: [],
     selectedModules: []
   });
 
@@ -57,11 +68,41 @@ const PricingCalculator = () => {
     }));
   };
 
-  const selectAILevel = (aiLevel: AILevel) => {
-    setState(prev => ({
-      ...prev,
-      selectedAILevel: aiLevel
-    }));
+  // Toggle para seleção de recursos de IA
+  const toggleAIFeature = (feature: AIFeature) => {
+    setState(prev => {
+      const features = [...prev.selectedAIFeatures];
+      const featureIndex = features.indexOf(feature);
+      
+      if (featureIndex >= 0) {
+        features.splice(featureIndex, 1);
+      } else {
+        features.push(feature);
+      }
+      
+      // Calcular valor total dos recursos selecionados
+      const totalValue = features.reduce((total, feat) => {
+        const featureObj = aiFeatures.find(item => item.name === feat);
+        return total + (featureObj?.value || 0);
+      }, 0);
+      
+      // Determinar o nível de IA com base no valor total
+      let aiLevel: AILevel | null = null;
+      
+      if (totalValue <= aiLevelThresholds.simple.max) {
+        aiLevel = "IA Simples";
+      } else if (totalValue <= aiLevelThresholds.intermediate.max) {
+        aiLevel = "IA Intermediária";
+      } else {
+        aiLevel = "IA Complexa";
+      }
+      
+      return {
+        ...prev,
+        selectedAIFeatures: features,
+        selectedAILevel: aiLevel
+      };
+    });
   };
 
   // Toggle para seleção de módulos
@@ -137,7 +178,7 @@ const PricingCalculator = () => {
       state.companyName.trim() !== "" &&
       state.selectedNiche !== null &&
       state.selectedObjective !== null &&
-      state.selectedAILevel !== null &&
+      state.selectedAIFeatures.length > 0 &&
       state.selectedModules.length > 0 &&
       state.selectedModules.every(module => module.complexity !== null)
     );
@@ -148,24 +189,53 @@ const PricingCalculator = () => {
     summaryRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Calcula o preço total
+  // Calcula o preço total (implementação e mensal)
   const totalPrice = calculateTotalPrice(state);
+  
+  // Gera cronograma de implementação
+  const timeline = generateImplementationTimeline(state);
 
   // Renderiza os ícones para os cards
   const renderIcon = (type: string, name: string) => {
     switch (type) {
       case "niche":
-        return (
-          <Building className="w-6 h-6 text-tars-highlight" />
-        );
+        switch (name) {
+          case "Clínicas":
+            return <HeartPulse className="w-6 h-6 text-tars-highlight" />;
+          case "Consultórios":
+            return <Users className="w-6 h-6 text-tars-highlight" />;
+          case "E-commerce":
+            return <ShoppingCart className="w-6 h-6 text-tars-highlight" />;
+          case "Franquias":
+            return <Building className="w-6 h-6 text-tars-highlight" />;
+          case "Indústria":
+            return <Factory className="w-6 h-6 text-tars-highlight" />;
+          case "Serviços":
+            return <Settings className="w-6 h-6 text-tars-highlight" />;
+          case "Saúde":
+            return <HeartPulse className="w-6 h-6 text-tars-highlight" />;
+          case "Varejo":
+            return <Store className="w-6 h-6 text-tars-highlight" />;
+          default:
+            return <Building className="w-6 h-6 text-tars-highlight" />;
+        }
       case "objective":
-        return (
-          <Target className="w-6 h-6 text-tars-highlight" />
-        );
+        switch (name) {
+          case "Aumentar Vendas":
+            return <TrendingUp className="w-6 h-6 text-tars-highlight" />;
+          case "Reduzir Custos":
+            return <TrendingDown className="w-6 h-6 text-tars-highlight" />;
+          case "Melhorar Experiência":
+            return <Smile className="w-6 h-6 text-tars-highlight" />;
+          case "Otimizar Tempo":
+            return <Clock className="w-6 h-6 text-tars-highlight" />;
+          case "Inteligência Estratégica":
+            return <Target className="w-6 h-6 text-tars-highlight" />;
+          default:
+            return <Target className="w-6 h-6 text-tars-highlight" />;
+        }
       case "ai":
-        return (
-          <Brain className="w-6 h-6 text-tars-highlight" />
-        );
+        return <Brain className="w-6 h-6 text-tars-highlight" />;
       case "module":
         switch (name) {
           case "Banco de Dados":
@@ -175,13 +245,19 @@ const PricingCalculator = () => {
           case "ERP":
             return <ClipboardList className="w-6 h-6 text-tars-highlight" />;
           case "CRM":
-            return <ClipboardList className="w-6 h-6 text-tars-highlight" />;
+            return <Users className="w-6 h-6 text-tars-highlight" />;
           case "Lembretes":
             return <BellRing className="w-6 h-6 text-tars-highlight" />;
           case "Análise de Dados":
             return <BarChart3 className="w-6 h-6 text-tars-highlight" />;
           case "Dashboard":
             return <LayoutDashboard className="w-6 h-6 text-tars-highlight" />;
+          case "API de Integração":
+            return <Code className="w-6 h-6 text-tars-highlight" />;
+          case "Portal do Cliente":
+            return <Globe className="w-6 h-6 text-tars-highlight" />;
+          case "Aplicativo Mobile":
+            return <Smartphone className="w-6 h-6 text-tars-highlight" />;
           default:
             return null;
         }
@@ -230,7 +306,7 @@ const PricingCalculator = () => {
       {/* Seção de Nicho do Projeto */}
       <div className="mb-10">
         <h2 className="text-xl font-semibold mb-4">Nicho do Projeto</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {businessNiches.map((niche) => (
             <SelectableCard
               key={niche}
@@ -259,32 +335,41 @@ const PricingCalculator = () => {
         </div>
       </div>
       
-      {/* Seção de Nível de IA */}
+      {/* Seção de Recursos de IA */}
       <div className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Nível de IA</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {aiLevels.map((ai) => (
+        <h2 className="text-xl font-semibold mb-4">Recursos de IA</h2>
+        <p className="mb-4 text-sm">Selecione os recursos de IA que deseja incluir no projeto. O nível de IA será determinado automaticamente com base nos recursos selecionados.</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {aiFeatures.map((feature) => (
             <SelectableCard
-              key={ai.name}
-              title={ai.name}
-              price={ai.price}
-              selected={state.selectedAILevel === ai.name}
-              onClick={() => selectAILevel(ai.name)}
-              icon={renderIcon("ai", ai.name)}
+              key={feature.name}
+              title={feature.name}
+              selected={state.selectedAIFeatures.includes(feature.name)}
+              onClick={() => toggleAIFeature(feature.name)}
+              icon={<Brain className="w-6 h-6 text-tars-highlight" />}
+              price={feature.value}
             />
           ))}
         </div>
+        
+        {state.selectedAILevel && (
+          <div className="mt-4 p-4 border border-tars-highlight rounded-md bg-opacity-20 bg-tars-highlight/10">
+            <p className="font-medium">Nível de IA determinado: <span className="font-bold text-tars-highlight">{state.selectedAILevel}</span></p>
+          </div>
+        )}
       </div>
       
       {/* Seção de Módulos e Complexidade */}
       <div className="mb-10">
         <h2 className="text-xl font-semibold mb-4">Módulos e Complexidade</h2>
+        <p className="mb-4 text-sm">Selecione os módulos que deseja incluir no projeto e defina o nível de complexidade para cada um.</p>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {availableModules.map((module) => (
             <div key={module.name} className="flex flex-col">
               <SelectableCard
                 title={module.name}
-                price={module.basePrice}
                 selected={isModuleSelected(module.name)}
                 onClick={() => toggleModule(module.name, module.basePrice)}
                 icon={renderIcon("module", module.name)}
@@ -296,6 +381,11 @@ const PricingCalculator = () => {
                   selected={getModuleComplexity(module.name)}
                   onChange={(complexity) => updateModuleComplexity(module.name, complexity)}
                   className="mt-2"
+                  prices={{
+                    easy: module.prices.easy,
+                    normal: module.prices.normal,
+                    complex: module.prices.complex
+                  }}
                 />
               )}
             </div>
@@ -336,17 +426,34 @@ const PricingCalculator = () => {
             <div>
               <span className="font-medium">Objetivo:</span> {state.selectedObjective}
             </div>
+            
+            <div className="pt-2">
+              <span className="font-medium">Recursos de IA Selecionados:</span>
+              <ul className="mt-2 space-y-1">
+                {state.selectedAIFeatures.map((feature) => {
+                  const featureObj = aiFeatures.find(ai => ai.name === feature);
+                  return (
+                    <li key={feature} className="flex justify-between">
+                      <span>{feature}</span>
+                      <span>R$ {featureObj?.value.toLocaleString('pt-BR')}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            
             <div>
-              <span className="font-medium">Nível de IA:</span> {state.selectedAILevel} → R$ {aiLevels.find(ai => ai.name === state.selectedAILevel)?.price.toLocaleString('pt-BR')}
+              <span className="font-medium">Nível de IA Resultante:</span> {state.selectedAILevel}
             </div>
             
             <div className="pt-2">
               <span className="font-medium">Módulos Selecionados:</span>
               <ul className="mt-2 space-y-2">
                 {state.selectedModules.map((module) => {
-                  // Preço do módulo com multiplicador de complexidade
-                  const modulePrice = module.complexity 
-                    ? module.basePrice * (module.complexity === "easy" ? 1.0 : module.complexity === "normal" ? 1.3 : 1.6)
+                  // Obter preço do módulo baseado na complexidade
+                  const modulePricing = availableModules.find(m => m.name === module.name);
+                  const price = module.complexity && modulePricing
+                    ? modulePricing.prices[module.complexity]
                     : 0;
                   
                   // Texto do nível de complexidade
@@ -359,7 +466,7 @@ const PricingCalculator = () => {
                   return (
                     <li key={module.name} className="flex justify-between">
                       <span>{module.name} ({complexityText})</span>
-                      <span>R$ {modulePrice.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</span>
+                      <span>R$ {price.toLocaleString('pt-BR')}</span>
                     </li>
                   );
                 })}
@@ -367,11 +474,32 @@ const PricingCalculator = () => {
             </div>
           </div>
           
+          {/* Seção de Cronograma */}
+          <div className="mt-8 mb-6 border-t border-border pt-4">
+            <h3 className="text-xl font-semibold mb-3">Cronograma de Implementação</h3>
+            <p className="mb-2 text-sm">Estimativa de tempo total: <span className="font-bold">{timeline.totalDays} dias</span></p>
+            
+            <div className="space-y-2 mt-4">
+              {timeline.tasks.map((task, index) => (
+                <div key={index} className="flex justify-between items-center">
+                  <span>{task.phase}</span>
+                  <span className="font-medium">{task.days} dias</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
           <div className="border-t border-border pt-4 mt-6">
-            <div className="flex justify-between items-center text-xl font-bold">
-              <span>Investimento Total:</span>
+            <div className="flex justify-between items-center text-xl font-bold mb-2">
+              <span>Investimento para Implementação:</span>
               <span className="text-tars-highlight">
-                R$ {totalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
+                R$ {totalPrice.implementation.toLocaleString('pt-BR')}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-lg">
+              <span>Mensalidade para Manutenção (20%):</span>
+              <span className="text-tars-highlight">
+                R$ {totalPrice.monthly.toLocaleString('pt-BR')}
               </span>
             </div>
           </div>
