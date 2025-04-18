@@ -19,7 +19,7 @@ const ComplexitySelector = ({
   prices
 }: ComplexitySelectorProps) => {
   return (
-    <div className={cn("flex justify-center gap-2 mt-2 animate-fade-in", className)}>
+    <div className={cn("flex flex-wrap justify-center gap-2 mt-2 animate-fade-in", className)}>
       <button
         className={cn(
           "complexity-btn flex flex-col items-center p-2 border rounded-md transition-all",
@@ -29,7 +29,7 @@ const ComplexitySelector = ({
         )}
         onClick={() => onChange("easy")}
       >
-        <span>Fácil</span>
+        <span className="font-medium">Fácil</span>
         {prices && (
           <span className="text-xs mt-1 font-semibold">
             R$ {prices.easy.toLocaleString('pt-BR')}
@@ -46,10 +46,15 @@ const ComplexitySelector = ({
         )}
         onClick={() => onChange("normal")}
       >
-        <span>Normal</span>
+        <span className="font-medium">Intermediário</span>
         {prices && (
           <span className="text-xs mt-1 font-semibold">
             R$ {prices.normal.toLocaleString('pt-BR')}
+          </span>
+        )}
+        {prices && (
+          <span className="text-xs text-gray-400">
+            (2x o valor Fácil)
           </span>
         )}
       </button>
@@ -63,10 +68,15 @@ const ComplexitySelector = ({
         )}
         onClick={() => onChange("complex")}
       >
-        <span>Complexo</span>
+        <span className="font-medium">Avançado</span>
         {prices && (
           <span className="text-xs mt-1 font-semibold">
             R$ {prices.complex.toLocaleString('pt-BR')}
+          </span>
+        )}
+        {prices && (
+          <span className="text-xs text-gray-400">
+            (2x o valor Intermediário)
           </span>
         )}
       </button>
