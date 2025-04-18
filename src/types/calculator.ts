@@ -1,4 +1,3 @@
-
 // Tipos para a calculadora de precificação
 
 export type BusinessNiche = 
@@ -55,9 +54,7 @@ export type ModuleName =
   | "Lembretes"
   | "Análise de Dados"
   | "Dashboard"
-  | "API de Integração"
-  | "Portal do Cliente"
-  | "Aplicativo Mobile";
+  | "API de Integração";
 
 export type ComplexityLevel = "easy" | "normal" | "complex";
 
@@ -190,16 +187,6 @@ export const availableModules: ModulePricing[] = [
     name: "API de Integração", 
     basePrice: 1100,
     prices: { easy: 1100, normal: 2200, complex: 4400 }
-  },
-  { 
-    name: "Portal do Cliente", 
-    basePrice: 1400,
-    prices: { easy: 1400, normal: 2800, complex: 5600 }
-  },
-  { 
-    name: "Aplicativo Mobile", 
-    basePrice: 1800,
-    prices: { easy: 1800, normal: 3600, complex: 7200 }
   }
 ];
 
@@ -414,7 +401,9 @@ ${state.selectedModules.map(module => {
     ? "Fácil" 
     : module.complexity === "normal" 
       ? "Intermediário" 
-      : "Avançado";
+      : module.complexity === "complex" 
+        ? "Avançado"
+        : "";
   return `   - ${module.name} (Complexidade: ${complexityText})`;
 }).join('\n')}
 

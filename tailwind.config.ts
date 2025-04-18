@@ -63,7 +63,7 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				tars: {
-					highlight: '#10b981',
+					highlight: '#D4AF37',
 					'highlight-foreground': '#ffffff',
 					focus: '#3b82f6'
 				}
