@@ -1,6 +1,4 @@
-// Tipos para a calculadora de precificação
-
-export type BusinessNiche = 
+export type BusinessNiche =
   | "Saúde"
   | "Varejo"
   | "E-commerce"
@@ -8,45 +6,51 @@ export type BusinessNiche =
   | "Indústria"
   | "Serviços";
 
-export type IndustryArea = 
-  | "Logística" 
-  | "Produção" 
-  | "Inteligência de Negócios" 
+export type IndustryArea =
+  | "Logística"
+  | "Produção"
+  | "Inteligência de Negócios"
   | "Envio de Relatórios";
 
-export type AutomationObjective = 
+export type AutomationObjective =
   | "Aumentar Vendas"
   | "Reduzir Custos"
   | "Melhorar Experiência"
   | "Otimizar Tempo"
   | "Inteligência Estratégica";
 
-export type AILevel = 
+export type AILevel =
   | "IA Simples"
   | "IA Intermediária"
   | "IA Complexa";
 
-export type AIFeature = 
-  | "Processamento de Linguagem Natural" 
-  | "Chatbot Integrado" 
-  | "Análise Preditiva" 
-  | "Reconhecimento de Imagem" 
-  | "Machine Learning Avançado"
-  | "Automação de Processos";
+export type AIFeature =
+  | "Análise Preditiva"
+  | "Processamento de Linguagem Natural (NLP)"
+  | "Reconhecimento de Imagens"
+  | "Chatbots Inteligentes"
+  | "Recomendação Personalizada"
+  | "Automação de Tarefas Repetitivas";
 
-export type AITraining = 
-  | "Treinamento Básico"
-  | "Treinamento Intermediário"
-  | "Treinamento Avançado";
+export type AITraining =
+  | "Nenhum"
+  | "Básico"
+  | "Avançado";
 
+// Update AITool type
 export type AITool = 
-  | "Reconhecimento de Padrões"
-  | "Aprendizado Supervisionado"
-  | "Aprendizado Não-Supervisionado"
-  | "Processamento de Linguagem Natural"
-  | "Visão Computacional";
+  | "Calendário"
+  | "Email"
+  | "Google Drive"
+  | "Recuperação de Documentos (RAG)"
+  | "Busca Semântica"
+  | "Análise de Dados"
+  | "Integração com APIs Externas"
+  | "Processamento de Imagens";
 
-export type ModuleName = 
+export type ComplexityLevel = "easy" | "normal" | "complex";
+
+export type ModuleName =
   | "Banco de Dados"
   | "WhatsApp"
   | "ERP"
@@ -56,23 +60,10 @@ export type ModuleName =
   | "Dashboard"
   | "API de Integração";
 
-export type ComplexityLevel = "easy" | "normal" | "complex";
-
 export interface Module {
   name: ModuleName;
   basePrice: number;
   complexity: ComplexityLevel | null;
-  quantity?: number;
-}
-
-export interface ModulePricing {
-  name: ModuleName;
-  basePrice: number;
-  prices: {
-    easy: number;
-    normal: number;
-    complex: number;
-  };
 }
 
 export interface CalculatorState {
@@ -92,350 +83,187 @@ export interface CalculatorState {
   selectedModules: Module[];
 }
 
-// Dados para as opções da calculadora
-export const businessNiches: { name: BusinessNiche; basePrice: number }[] = [
-  { name: "Saúde", basePrice: 3000 },
-  { name: "Varejo", basePrice: 4000 },
-  { name: "E-commerce", basePrice: 3500 },
-  { name: "Franquias", basePrice: 5000 },
-  { name: "Indústria", basePrice: 6000 },
-  { name: "Serviços", basePrice: 3800 }
-];
-
-export const industryAreas: { name: IndustryArea; priceMultiplier: number }[] = [
-  { name: "Logística", priceMultiplier: 1.2 },
-  { name: "Produção", priceMultiplier: 1.5 },
-  { name: "Inteligência de Negócios", priceMultiplier: 1.8 },
-  { name: "Envio de Relatórios", priceMultiplier: 1.3 }
-];
-
-export const automationObjectives: AutomationObjective[] = [
-  "Aumentar Vendas",
-  "Reduzir Custos",
-  "Melhorar Experiência",
-  "Otimizar Tempo",
-  "Inteligência Estratégica"
-];
-
-// AI Features, Training and Tools
-export const aiFeatures: { name: AIFeature; value: number }[] = [
-  { name: "Processamento de Linguagem Natural", value: 800 },
-  { name: "Chatbot Integrado", value: 600 },
-  { name: "Análise Preditiva", value: 1200 },
-  { name: "Reconhecimento de Imagem", value: 1000 },
-  { name: "Machine Learning Avançado", value: 1500 },
-  { name: "Automação de Processos", value: 700 }
-];
-
-export const aiTraining: { name: AITraining; value: number }[] = [
-  { name: "Treinamento Básico", value: 500 },
-  { name: "Treinamento Intermediário", value: 1000 },
-  { name: "Treinamento Avançado", value: 2000 }
-];
-
-export const aiTools: { name: AITool; value: number }[] = [
-  { name: "Reconhecimento de Padrões", value: 300 },
-  { name: "Aprendizado Supervisionado", value: 500 },
-  { name: "Aprendizado Não-Supervisionado", value: 700 },
-  { name: "Processamento de Linguagem Natural", value: 600 },
-  { name: "Visão Computacional", value: 800 }
-];
-
 export const aiLevelThresholds = {
-  simple: { min: 0, max: 1500, price: 800 },
-  intermediate: { min: 1501, max: 3000, price: 1600 },
-  complex: { min: 3001, max: Infinity, price: 3200 }
+  simple: { max: 2000 },
+  intermediate: { max: 4000 }
 };
 
-export const availableModules: ModulePricing[] = [
-  { 
-    name: "Banco de Dados", 
-    basePrice: 1000,
-    prices: { easy: 1000, normal: 2000, complex: 4000 }
-  },
-  { 
-    name: "WhatsApp", 
-    basePrice: 800,
-    prices: { easy: 800, normal: 1600, complex: 3200 }
-  },
-  { 
-    name: "ERP", 
-    basePrice: 1200,
-    prices: { easy: 1200, normal: 2400, complex: 4800 }
-  },
-  { 
-    name: "CRM", 
-    basePrice: 900,
-    prices: { easy: 900, normal: 1800, complex: 3600 }
-  },
-  { 
-    name: "Lembretes", 
-    basePrice: 500,
-    prices: { easy: 500, normal: 1000, complex: 2000 }
-  },
-  { 
-    name: "Análise de Dados", 
+// Update aiTools array
+export const aiTools: { name: AITool; value: number }[] = [
+  { name: "Calendário", value: 500 },
+  { name: "Email", value: 400 },
+  { name: "Google Drive", value: 600 },
+  { name: "Recuperação de Documentos (RAG)", value: 800 },
+  { name: "Busca Semântica", value: 700 },
+  { name: "Análise de Dados", value: 900 },
+  { name: "Integração com APIs Externas", value: 1000 },
+  { name: "Processamento de Imagens", value: 800 }
+];
+
+export const availableModules: {
+  name: ModuleName;
+  basePrice: number;
+  prices: { [key in ComplexityLevel]: number };
+}[] = [
+  {
+    name: "Banco de Dados",
     basePrice: 1500,
-    prices: { easy: 1500, normal: 3000, complex: 6000 }
+    prices: { easy: 2000, normal: 3000, complex: 4500 }
   },
-  { 
-    name: "Dashboard", 
-    basePrice: 1300,
-    prices: { easy: 1300, normal: 2600, complex: 5200 }
+  {
+    name: "WhatsApp",
+    basePrice: 1200,
+    prices: { easy: 1800, normal: 2700, complex: 4000 }
   },
-  { 
-    name: "API de Integração", 
-    basePrice: 1100,
-    prices: { easy: 1100, normal: 2200, complex: 4400 }
+  {
+    name: "ERP",
+    basePrice: 2500,
+    prices: { easy: 3000, normal: 4500, complex: 6000 }
+  },
+  {
+    name: "CRM",
+    basePrice: 2000,
+    prices: { easy: 2500, normal: 3800, complex: 5200 }
+  },
+  {
+    name: "Lembretes",
+    basePrice: 800,
+    prices: { easy: 1200, normal: 1800, complex: 2500 }
+  },
+  {
+    name: "Análise de Dados",
+    basePrice: 1800,
+    prices: { easy: 2400, normal: 3600, complex: 5000 }
+  },
+  {
+    name: "Dashboard",
+    basePrice: 1500,
+    prices: { easy: 2000, normal: 3000, complex: 4200 }
+  },
+  {
+    name: "API de Integração",
+    basePrice: 2200,
+    prices: { easy: 2800, normal: 4200, complex: 5800 }
   }
 ];
 
-// Multiplicadores para níveis de complexidade
-export const complexityMultipliers: Record<ComplexityLevel, number> = {
-  easy: 1.0,
-  normal: 2.0,
-  complex: 4.0
-};
-
-// Função para calcular o preço total
-export const calculateTotalPrice = (state: CalculatorState): { implementation: number, monthly: number } => {
+export const calculateTotalPrice = (state: CalculatorState) => {
   let implementationTotal = 0;
-  
-  // Preço base do nicho selecionado multiplicado pelo número de unidades
+  let monthlyTotal = 0;
+
+  // Calcula o preço do nicho
   if (state.selectedNiche) {
-    const nicheObj = businessNiches.find(n => n.name === state.selectedNiche);
-    if (nicheObj) {
-      implementationTotal += nicheObj.basePrice * Math.max(1, state.nicheUnits);
+    const niche = businessNiches.find((n) => n.name === state.selectedNiche);
+    implementationTotal += (niche?.basePrice || 0) * state.nicheUnits;
+  }
+
+  // Calcula o preço da área da indústria
+  if (state.selectedIndustryArea) {
+    const industryArea = industryAreas.find((area) => area.name === state.selectedIndustryArea);
+    implementationTotal += industryArea?.basePrice || 0;
+  }
+
+  // Calcula o preço dos recursos de IA
+  state.selectedAIFeatures.forEach((feature) => {
+    const aiFeature = aiFeatures.find((ai) => ai.name === feature);
+    implementationTotal += aiFeature?.value || 0;
+  });
+
+  // Calcula o preço do treinamento de IA
+  if (state.selectedAITraining) {
+    const aiTraining = aiTraining.find((training) => training.name === state.selectedAITraining);
+    implementationTotal += aiTraining?.value || 0;
+  }
+
+  // Calcula o preço das ferramentas de IA
+  state.selectedAITools.forEach((tool) => {
+    const aiTool = aiTools.find((t) => t.name === tool);
+    implementationTotal += aiTool?.value || 0;
+  });
+
+  // Calcula o preço dos módulos
+  state.selectedModules.forEach((module) => {
+    const selectedModule = availableModules.find((m) => m.name === module.name);
+    if (selectedModule && module.complexity) {
+      implementationTotal += selectedModule.prices[module.complexity];
     }
-  }
-  
-  // Adicional para área específica de indústria
-  if (state.selectedNiche === "Indústria" && state.selectedIndustryArea) {
-    const areaObj = industryAreas.find(a => a.name === state.selectedIndustryArea);
-    if (areaObj) {
-      implementationTotal = implementationTotal * areaObj.priceMultiplier;
-    }
-  }
-  
-  // Adicional para cada número de WhatsApp
-  if (state.whatsappNumbers > 0 && state.selectedModules.some(m => m.name === "WhatsApp")) {
-    const whatsappModule = availableModules.find(m => m.name === "WhatsApp");
-    if (whatsappModule) {
-      const moduleObj = state.selectedModules.find(m => m.name === "WhatsApp");
-      const complexity = moduleObj?.complexity || "easy";
-      implementationTotal += whatsappModule.prices[complexity] * (state.whatsappNumbers - 1);
-    }
-  }
-  
-  // Calcular valor total de recursos de IA, treinamento e ferramentas selecionadas
-  const aiTotalValue = state.selectedAIFeatures.reduce((total, feature) => {
-    const featureObj = aiFeatures.find(item => item.name === feature);
-    return total + (featureObj?.value || 0);
-  }, 0);
-  
-  const aiTrainingValue = state.selectedAITraining ? 
-    aiTraining.find(item => item.name === state.selectedAITraining)?.value || 0 : 0;
-  
-  const aiToolsValue = state.selectedAITools.reduce((total, tool) => {
-    const toolObj = aiTools.find(item => item.name === tool);
-    return total + (toolObj?.value || 0);
-  }, 0);
-  
-  const totalAIValue = aiTotalValue + aiTrainingValue + aiToolsValue;
-  
-  // Determinar nível de IA e preço baseado no valor total
-  const aiLevelPrice = totalAIValue <= aiLevelThresholds.simple.max 
-    ? aiLevelThresholds.simple.price
-    : totalAIValue <= aiLevelThresholds.intermediate.max
-      ? aiLevelThresholds.intermediate.price
-      : aiLevelThresholds.complex.price;
-  
-  implementationTotal += aiLevelPrice;
-  
-  // Soma dos preços dos módulos selecionados com preço baseado na complexidade
-  implementationTotal += state.selectedModules.reduce((total, module) => {
-    if (module.complexity === null) return total;
-    
-    const modulePricing = availableModules.find(m => m.name === module.name);
-    if (!modulePricing) return total;
-    
-    const price = modulePricing.prices[module.complexity];
-    const quantity = module.quantity || 1;
-    
-    return total + (price * quantity);
-  }, 0);
-  
-  // Adicional para cada objetivo selecionado (exceto o primeiro)
-  if (state.selectedObjectives.length > 1) {
-    implementationTotal += (state.selectedObjectives.length - 1) * 500;
-  }
-  
-  const monthlyTotal = implementationTotal * 0.2; // 20% do valor da implementação
-  
+  });
+
+  monthlyTotal = implementationTotal * 0.2;
+
   return {
     implementation: implementationTotal,
     monthly: monthlyTotal
   };
 };
 
-// Função para gerar estimativa de tempo de implementação
-export const generateImplementationTimeline = (state: CalculatorState): { totalDays: number, tasks: { phase: string, days: number, description: string }[] } => {
-  // Total máximo de dias é 45 conforme solicitado
-  const totalMaxDays = 45;
-  
-  // Calcular proporções baseadas na complexidade do projeto
-  let complexityFactor = 1;
-  
-  // Considerar número de módulos e sua complexidade
-  const modulesComplexitySum = state.selectedModules.reduce((sum, module) => {
-    if (module.complexity === "easy") return sum + 1;
-    if (module.complexity === "normal") return sum + 2;
-    if (module.complexity === "complex") return sum + 3;
-    return sum;
-  }, 0);
-  
-  complexityFactor += (modulesComplexitySum / 10);
-  
-  // Considerar nível de IA
-  if (state.selectedAILevel === "IA Intermediária") complexityFactor += 0.3;
-  if (state.selectedAILevel === "IA Complexa") complexityFactor += 0.6;
-  
-  // Ajustar para número de objetivos
-  complexityFactor += (state.selectedObjectives.length - 1) * 0.1;
-  
-  // Definir fases do projeto com proporções do tempo total
-  const phases = [
-    { 
-      phase: "Análise e Requisitos", 
-      proportion: 0.15, 
-      description: "Levantamento detalhado de requisitos, análise de processos atuais e definição de escopo."
-    },
-    { 
-      phase: "Design e Arquitetura", 
-      proportion: 0.15, 
-      description: "Criação da arquitetura do sistema, modelagem de dados e prototipação de interfaces."
-    },
-    { 
-      phase: "Desenvolvimento", 
-      proportion: 0.4, 
-      description: "Codificação dos módulos, integração de IA e desenvolvimento de funcionalidades."
-    },
-    { 
-      phase: "Testes e Qualidade", 
-      proportion: 0.15, 
-      description: "Testes de funcionalidade, performance, segurança e correção de bugs."
-    },
-    { 
-      phase: "Treinamento e Implantação", 
-      proportion: 0.15, 
-      description: "Capacitação dos usuários, migração de dados e ativação do sistema."
-    }
+export const generateImplementationTimeline = (state: CalculatorState) => {
+  const tasks = [
+    { phase: "Planejamento", days: 5, description: "Definição detalhada do escopo e planejamento do projeto." },
+    { phase: "Design", days: 7, description: "Criação do design da interface e experiência do usuário." },
+    { phase: "Desenvolvimento", days: 15, description: "Implementação das funcionalidades e integração dos módulos." },
+    { phase: "Testes", days: 3, description: "Testes de qualidade e correção de bugs." },
+    { phase: "Implantação", days: 2, description: "Implantação do sistema e treinamento dos usuários." }
   ];
-  
-  // Calcular dias para cada fase, garantindo que o total não ultrapasse 45 dias
-  const tasks = phases.map(phase => ({
-    phase: phase.phase,
-    days: Math.round(totalMaxDays * phase.proportion),
-    description: phase.description
-  }));
-  
-  // Ajustar para garantir que o total seja exatamente 45 dias
-  const calculatedTotalDays = tasks.reduce((sum, task) => sum + task.days, 0);
-  if (calculatedTotalDays < totalMaxDays) {
-    // Adicionar dias restantes à fase de desenvolvimento
-    const devPhaseIndex = tasks.findIndex(t => t.phase === "Desenvolvimento");
-    if (devPhaseIndex >= 0) {
-      tasks[devPhaseIndex].days += (totalMaxDays - calculatedTotalDays);
-    }
-  } else if (calculatedTotalDays > totalMaxDays) {
-    // Reduzir dias proporcionalmente
-    const excess = calculatedTotalDays - totalMaxDays;
-    for (let i = 0; i < excess; i++) {
-      const highestDaysIndex = tasks.reduce((maxIndex, task, index, array) => 
-        task.days > array[maxIndex].days ? index : maxIndex, 0);
-      tasks[highestDaysIndex].days--;
-    }
-  }
-  
+
+  let totalDays = 0;
+  tasks.forEach(task => totalDays += task.days);
+
   return {
-    totalDays: totalMaxDays,
-    tasks
+    totalDays: totalDays,
+    tasks: tasks
   };
 };
 
-// Função para gerar proposta comercial
 export const generateCommercialProposal = (state: CalculatorState): string => {
-  if (!state.selectedNiche || !state.selectedAILevel || state.selectedModules.length === 0) {
-    return "Dados insuficientes para gerar proposta.";
-  }
-  
   const totalPrice = calculateTotalPrice(state);
-  const timeline = generateImplementationTimeline(state);
-  
-  const proposal = `
-# PROPOSTA COMERCIAL: SOLUÇÃO DE AUTOMAÇÃO INTELIGENTE
 
-## CLIENTE: ${state.clientName}
-## EMPRESA: ${state.companyName}
+  return `
+Proposta Comercial
 
-### VISÃO GERAL DO PROJETO
+Prezado(a) ${state.clientName},
 
-Baseado na sua ideia inicial: "${state.initialIdea}", desenvolvemos uma solução personalizada 
-para o nicho de ${state.selectedNiche}${state.nicheUnits > 1 ? ` com ${state.nicheUnits} unidades` : ""}.
+Agradecemos a oportunidade de apresentar nossa proposta para o desenvolvimento de uma solução de automação inteligente para a sua empresa, ${state.companyName}.
 
-Esta solução foi elaborada com foco nos seguintes objetivos:
-${state.selectedObjectives.map(obj => `- ${obj}`).join('\n')}
+Escopo do Projeto:
+- Cliente: ${state.clientName}
+- Empresa: ${state.companyName}
+- Telefone: ${state.clientPhone}
+- Ideia Inicial: ${state.initialIdea}
+- Nicho: ${state.selectedNiche} ${state.nicheUnits > 1 ? `(${state.nicheUnits} unidades)` : ""}
+${state.selectedIndustryArea ? `- Área da Indústria: ${state.selectedIndustryArea}` : ""}
+- Objetivos:
+${state.selectedObjectives.map(objective => `  - ${objective}\n`).join('')}
+- Recursos de IA:
+${state.selectedAIFeatures.map(feature => `  - ${feature}\n`).join('')}
+${state.selectedAITraining ? `- Treinamento de IA: ${state.selectedAITraining}\n` : ""}
+- Módulos Selecionados:
+${state.selectedModules.map(module => `  - ${module.name} (${module.complexity})\n`).join('')}
 
-### ESCOPO TÉCNICO
+Investimento:
+- Implementação: R$ ${totalPrice.implementation.toLocaleString('pt-BR')}
+- Mensalidade (Manutenção): R$ ${totalPrice.monthly.toLocaleString('pt-BR')}
 
-A solução proposta inclui:
+Cronograma de Implementação:
+${generateImplementationTimeline(state).tasks.map(task => `  - ${task.phase}: ${task.days} dias\n`).join('')}
 
-1. **Nível de Inteligência Artificial: ${state.selectedAILevel}**
-   - Recursos de IA incluídos: ${state.selectedAIFeatures.join(', ')}
-   ${state.selectedAITraining ? `- Nível de treinamento: ${state.selectedAITraining}` : ''}
-   ${state.selectedAITools.length > 0 ? `- Ferramentas de IA: ${state.selectedAITools.join(', ')}` : ''}
+Condições Gerais:
+- Prazo de Entrega: [A definir]
+- Forma de Pagamento: [A combinar]
 
-2. **Módulos Incluídos:**
-${state.selectedModules.map(module => {
-  const complexityText = module.complexity === "easy" 
-    ? "Fácil" 
-    : module.complexity === "normal" 
-      ? "Intermediário" 
-      : module.complexity === "complex" 
-        ? "Avançado"
-        : "";
-  return `   - ${module.name} (Complexidade: ${complexityText})`;
-}).join('\n')}
+Aguardamos ansiosamente a sua aprovação para darmos início a este projeto inovador.
 
-### CRONOGRAMA DE IMPLEMENTAÇÃO (${timeline.totalDays} dias)
-
-${timeline.tasks.map(task => `${task.phase} (${task.days} dias): ${task.description}`).join('\n\n')}
-
-### INVESTIMENTO
-
-- **Valor total para implementação:** R$ ${totalPrice.implementation.toLocaleString('pt-BR')}
-- **Mensalidade para manutenção e suporte:** R$ ${totalPrice.monthly.toLocaleString('pt-BR')}
-
-### BENEFÍCIOS ESPERADOS
-
-- Automação de processos operacionais
-- Redução de tempo em tarefas repetitivas
-- Insights baseados em dados para tomada de decisão
-- Melhoria na experiência do cliente
-- Escalabilidade do negócio
-
-### PRÓXIMOS PASSOS
-
-1. Aprovação da proposta
-2. Reunião inicial com equipe técnica
-3. Início da fase de análise e requisitos
-4. Desenvolvimento conforme cronograma
-5. Testes, treinamento e implantação
-
----
-
-Proposta válida por 30 dias.
+Atenciosamente,
+TARS AI
 `;
-  
-  return proposal;
 };
+
+// Update businessNiches to remove explicit pricing display
+export const businessNiches: { name: BusinessNiche; basePrice: number }[] = [
+  { name: "Saúde", basePrice: 2500 },
+  { name: "Varejo", basePrice: 2000 },
+  { name: "E-commerce", basePrice: 2200 },
+  { name: "Franquias", basePrice: 3000 },
+  { name: "Indústria", basePrice: 4000 },
+  { name: "Serviços", basePrice: 1800 }
+];

@@ -1,11 +1,11 @@
-
+import { ComplexityLevel, complexityLevels } from "@/types/calculator";
 import { cn } from "@/lib/utils";
 
 interface ComplexitySelectorProps {
-  selected: "easy" | "normal" | "complex" | null;
-  onChange: (complexity: "easy" | "normal" | "complex") => void;
+  selected: ComplexityLevel | null;
+  onChange: (complexity: ComplexityLevel) => void;
   className?: string;
-  prices?: {
+  prices: {
     easy: number;
     normal: number;
     complex: number;
@@ -19,67 +19,28 @@ const ComplexitySelector = ({
   prices
 }: ComplexitySelectorProps) => {
   return (
-    <div className={cn("flex flex-wrap justify-center gap-2 mt-2 animate-fade-in", className)}>
-      <button
-        className={cn(
-          "complexity-btn flex flex-col items-center p-2 border rounded-md transition-all",
-          selected === "easy" 
-            ? "border-tars-highlight bg-tars-highlight bg-opacity-10 text-tars-highlight" 
-            : "border-border hover:border-tars-highlight/50"
-        )}
-        onClick={() => onChange("easy")}
-      >
-        <span className="font-medium">Fácil</span>
-        {prices && (
-          <span className="text-xs mt-1 font-semibold">
-            R$ {prices.easy.toLocaleString('pt-BR')}
-          </span>
-        )}
-      </button>
-      
-      <button
-        className={cn(
-          "complexity-btn flex flex-col items-center p-2 border rounded-md transition-all",
-          selected === "normal" 
-            ? "border-tars-highlight bg-tars-highlight bg-opacity-10 text-tars-highlight" 
-            : "border-border hover:border-tars-highlight/50"
-        )}
-        onClick={() => onChange("normal")}
-      >
-        <span className="font-medium">Intermediário</span>
-        {prices && (
-          <span className="text-xs mt-1 font-semibold">
-            R$ {prices.normal.toLocaleString('pt-BR')}
-          </span>
-        )}
-        {prices && (
-          <span className="text-xs text-gray-400">
-            (2x o valor Fácil)
-          </span>
-        )}
-      </button>
-      
-      <button
-        className={cn(
-          "complexity-btn flex flex-col items-center p-2 border rounded-md transition-all",
-          selected === "complex" 
-            ? "border-tars-highlight bg-tars-highlight bg-opacity-10 text-tars-highlight" 
-            : "border-border hover:border-tars-highlight/50"
-        )}
-        onClick={() => onChange("complex")}
-      >
-        <span className="font-medium">Avançado</span>
-        {prices && (
-          <span className="text-xs mt-1 font-semibold">
-            R$ {prices.complex.toLocaleString('pt-BR')}
-          </span>
-        )}
-        {prices && (
-          <span className="text-xs text-gray-400">
-            (2x o valor Intermediário)
-          </span>
-        )}
-      </button>
+    <div className={cn("flex flex-col gap-2 animate-fade-in", className)}>
+      {Object.entries(complexityLevels).map(([level, label]) => (
+        <button
+          key={level}
+          onClick={() => onChange(level as ComplexityLevel)}
+          className={cn(
+            "complexity-btn px-3 py-2 rounded-md text-sm font-medium border-2 transition-all duration-200",
+            selected === level
+              ? "border-tars-highlight text-tars-highlight-foreground bg-tars-highlight"
+              : "border-border hover:border-tars-highlight/50 hover:bg-tars-highlight/10"
+          )}
+        >
+          <div className="flex flex-col items-center gap-1">
+            <span>{label}</span>
+            {prices && (
+              <span className="text-xs font-normal">
+                R$ {prices[level as ComplexityLevel].toLocaleString('pt-BR')}
+              </span>
+            )}
+          </div>
+        </button>
+      ))}
     </div>
   );
 };

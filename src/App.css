@@ -1,26 +1,25 @@
-
 #root {
   width: 100%;
   min-height: 100vh;
 }
 
-/* Estilos para transições e animações */
+/* Transições e animações */
 .hover-scale {
   transition: transform 0.2s ease-in-out;
 }
 
 .hover-scale:hover {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
-/* Estilo para melhorar o aspecto dos inputs */
+/* Melhorar aspecto dos inputs */
 input:focus, 
 textarea:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.5);
 }
 
-/* Cores e estilos específicos - atualizado para dourado */
+/* Cores e estilos - tema dourado */
 .text-tars-highlight {
   color: #D4AF37;
 }
@@ -33,7 +32,7 @@ textarea:focus {
   border-color: #D4AF37;
 }
 
-/* Estilos para cards selecionáveis */
+/* Cards selecionáveis */
 .tars-card {
   position: relative;
   border-radius: 0.5rem;
@@ -66,7 +65,7 @@ textarea:focus {
   border-color: transparent #D4AF37 transparent transparent;
 }
 
-/* Estilos para botões de complexidade */
+/* Botões de complexidade */
 .complexity-btn {
   min-width: 85px;
   text-align: center;
