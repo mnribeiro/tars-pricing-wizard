@@ -1,10 +1,10 @@
 
-import { CalculatorState, Module, ModuleData, calculateTotalPrice, generateImplementationTimeline, modulesData } from "@/types/calculator";
+import { CalculatorState, Module, ModuleData, calculateTotalPrice, generateImplementationTimeline, modulesData, generateModuleScope, generateDeliverables, generateBusinessValue } from "@/types/calculator";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
-import { Check, Download, FileText } from "lucide-react";
+import { Check, Download, FileText, Calendar, Package, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
@@ -27,6 +27,9 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
   
   const totalPrice = calculateTotalPrice(state);
   const timeline = generateImplementationTimeline(state);
+  const scopeDetails = generateModuleScope(state);
+  const deliverables = generateDeliverables(state);
+  const businessValues = generateBusinessValue(state);
   
   // Get module data with pricing information
   const getModuleWithPricing = (module: Module): { name: string; level: string; price: number } => {
@@ -73,10 +76,31 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
     const splitDescription = doc.splitTextToSize(state.projectDescription, 180);
     doc.text(splitDescription, 14, 106);
     
-    // Implementation Timeline
+    // Module scope details
     let yPos = 106 + splitDescription.length * 6;
     doc.setFont("helvetica", "bold");
-    doc.text("Cronograma de Implementação", 14, yPos);
+    doc.text("Detalhamento do Escopo", 14, yPos);
+    yPos += 10;
+    
+    const scopeData = scopeDetails.map(item => [
+      item.module,
+      item.level,
+      item.description
+    ]);
+    
+    doc.autoTable({
+      startY: yPos,
+      head: [["Módulo", "Nível", "Funcionalidades"]],
+      body: scopeData,
+      theme: "striped",
+      headStyles: { fillColor: [212, 175, 55] }
+    });
+    
+    yPos = (doc as any).lastAutoTable.finalY + 10;
+    
+    // Implementation Timeline
+    doc.setFont("helvetica", "bold");
+    doc.text("Cronograma de Implementação (30 dias)", 14, yPos);
     yPos += 10;
     
     const timelineData = timeline.tasks.map(task => [
@@ -91,6 +115,46 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
       body: timelineData,
       theme: "striped",
       headStyles: { fillColor: [212, 175, 55] }
+    });
+    
+    yPos = (doc as any).lastAutoTable.finalY + 10;
+    
+    // Project Deliverables
+    doc.setFont("helvetica", "bold");
+    doc.text("Entregas do Projeto", 14, yPos);
+    yPos += 10;
+    
+    const deliverablesChunks = [];
+    for (let i = 0; i < deliverables.length; i += 2) {
+      deliverablesChunks.push(deliverables.slice(i, i + 2));
+    }
+    
+    const deliverablesData = deliverablesChunks.map(chunk => {
+      return chunk.length === 2 ? chunk : [...chunk, ""];
+    });
+    
+    doc.autoTable({
+      startY: yPos,
+      body: deliverablesData,
+      theme: "plain"
+    });
+    
+    yPos = (doc as any).lastAutoTable.finalY + 10;
+    
+    // Business Value
+    doc.setFont("helvetica", "bold");
+    doc.text("Valor de Negócio", 14, yPos);
+    yPos += 10;
+    
+    const businessValueChunks = [];
+    for (let i = 0; i < businessValues.length; i += 1) {
+      businessValueChunks.push([businessValues[i]]);
+    }
+    
+    doc.autoTable({
+      startY: yPos,
+      body: businessValueChunks,
+      theme: "plain"
     });
     
     yPos = (doc as any).lastAutoTable.finalY + 10;
@@ -124,18 +188,41 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
     doc.text("Investimento", 14, yPos);
     yPos += 10;
     
+    const investmentData = [];
+    
+    investmentData.push(["Implementação", `R$ ${totalPrice.implementation.toLocaleString('pt-BR')}`]);
+    
+    if (state.discount > 0) {
+      investmentData.push(
+        ["Valor Original", `R$ ${totalPrice.originalImplementation.toLocaleString('pt-BR')}`],
+        [`Desconto (${state.discount}%)`, `R$ ${totalPrice.discountAmount.toLocaleString('pt-BR')}`]
+      );
+    }
+    
+    investmentData.push(["Mensalidade (Recorrência)", `R$ ${totalPrice.monthly.toLocaleString('pt-BR')}`]);
+    
     doc.autoTable({
       startY: yPos,
       head: [["Tipo", "Valor"]],
-      body: [
-        ["Implementação", `R$ ${totalPrice.implementation.toLocaleString('pt-BR')}`],
-        ["Mensalidade (Recorrência)", `R$ ${totalPrice.monthly.toLocaleString('pt-BR')}`]
-      ],
+      body: investmentData,
       theme: "striped",
       headStyles: { fillColor: [212, 175, 55] }
     });
     
     yPos = (doc as any).lastAutoTable.finalY + 10;
+    
+    // Conditions 
+    doc.setFont("helvetica", "bold");
+    doc.text("Condições Comerciais", 14, yPos);
+    yPos += 10;
+    
+    doc.setFont("helvetica", "normal");
+    doc.text("- Prazo de implementação: 30 dias corridos", 14, yPos);
+    yPos += 6;
+    doc.text("- Forma de pagamento da implementação: 40% de entrada + 60% na entrega", 14, yPos);
+    yPos += 6;
+    doc.text("- Mensalidade: Cobrada mensalmente após a conclusão da implementação", 14, yPos);
+    yPos += 15;
     
     // Notes
     if (state.notes) {
@@ -231,10 +318,78 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
             </div>
           </div>
           
+          {/* Module Scope */}
+          <div>
+            <h3 className="text-lg font-medium mb-3">Detalhamento do Escopo</h3>
+            <div className="space-y-4">
+              {scopeDetails.map((item, index) => (
+                <div key={index} className="p-4 border border-gray-700 rounded-lg">
+                  <div className="flex justify-between">
+                    <h4 className="font-medium">{item.module}</h4>
+                    <span className="text-sm bg-[#D4AF37]/20 px-2 py-1 rounded">
+                      {item.level}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm">{item.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Timeline */}
+          <div>
+            <h3 className="text-lg font-medium mb-3 flex items-center">
+              <Calendar className="w-5 h-5 mr-2 text-[#D4AF37]" />
+              Cronograma de Implementação (30 dias)
+            </h3>
+            <div className="space-y-3">
+              {timeline.tasks.map((task, index) => (
+                <div key={index} className="border-l-2 border-[#D4AF37] pl-4 py-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">{task.phase}</span>
+                    <span className="text-sm font-medium bg-[#D4AF37] text-white px-2 py-1 rounded-full">{task.days} dias</span>
+                  </div>
+                  <p className="text-sm text-gray-300 mt-1">{task.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Project Deliverables */}
+          <div>
+            <h3 className="text-lg font-medium mb-3 flex items-center">
+              <Package className="w-5 h-5 mr-2 text-[#D4AF37]" />
+              Entregas do Projeto
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {deliverables.map((item, index) => (
+                <div key={index} className="flex items-center">
+                  <Check className="w-4 h-4 text-[#D4AF37] mr-2" />
+                  <span className="text-sm">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Business Value */}
+          <div>
+            <h3 className="text-lg font-medium mb-3 flex items-center">
+              <TrendingUp className="w-5 h-5 mr-2 text-[#D4AF37]" />
+              Valor de Negócio
+            </h3>
+            <div className="space-y-2">
+              {businessValues.map((value, index) => (
+                <div key={index} className="bg-[#D4AF37]/5 p-3 rounded-lg">
+                  {value}
+                </div>
+              ))}
+            </div>
+          </div>
+          
           {/* Discount */}
           {showDiscount && (
             <div className="p-4 border border-[#D4AF37] rounded-lg bg-[#D4AF37]/10 animate-fade-in">
-              <Label htmlFor="discount">Desconto (%)</Label>
+              <Label htmlFor="discount">Desconto (%) - Aplicado apenas na implementação</Label>
               <div className="flex gap-2 mt-2">
                 <Input
                   id="discount"
@@ -246,7 +401,7 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
                   className="bg-card border-border max-w-[100px]"
                 />
                 <p className="flex items-center">
-                  {state.discount > 0 && `Economia de R$ ${(calculateTotalPrice({...state, discount: 0}).implementation * state.discount / 100).toLocaleString('pt-BR')}`}
+                  {state.discount > 0 && `Economia de R$ ${totalPrice.discountAmount.toLocaleString('pt-BR')}`}
                 </p>
               </div>
             </div>
@@ -273,11 +428,25 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
                 R$ {totalPrice.implementation.toLocaleString('pt-BR')}
               </span>
             </div>
+            
+            {state.discount > 0 && (
+              <div className="flex justify-between items-center text-sm mb-2">
+                <span className="font-medium">Valor Original:</span>
+                <span className="text-gray-300 line-through">
+                  R$ {totalPrice.originalImplementation.toLocaleString('pt-BR')}
+                </span>
+              </div>
+            )}
+            
             <div className="flex justify-between items-center">
               <span className="font-medium text-lg">Mensalidade (20%):</span>
               <span className="text-xl font-bold text-[#D4AF37]">
                 R$ {totalPrice.monthly.toLocaleString('pt-BR')}
               </span>
+            </div>
+            
+            <div className="text-xs text-gray-400 mt-1">
+              * A mensalidade é calculada como 20% do valor original de implementação, sem aplicação de descontos.
             </div>
           </div>
           
@@ -329,7 +498,24 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
           </div>
           
           <div>
-            <h3 className="text-xl font-medium border-b border-[#D4AF37] pb-2 mb-3">Cronograma de Implementação</h3>
+            <h3 className="text-xl font-medium border-b border-[#D4AF37] pb-2 mb-3">Detalhamento do Escopo</h3>
+            <div className="space-y-4">
+              {scopeDetails.map((item, index) => (
+                <div key={index} className="flex gap-4">
+                  <div className="font-bold w-8 h-8 rounded-full bg-[#D4AF37] text-white flex items-center justify-center">
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p className="font-medium">{item.module} - {item.level}</p>
+                    <p className="text-sm text-gray-300">{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-medium border-b border-[#D4AF37] pb-2 mb-3">Cronograma de Implementação (30 dias)</h3>
             <div className="space-y-4">
               {timeline.tasks.map((task, index) => (
                 <div key={index} className="flex gap-4">
@@ -340,6 +526,30 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
                     <p className="font-medium">{task.phase}</p>
                     <p className="text-sm text-gray-300">{task.days} dias - {task.description}</p>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-medium border-b border-[#D4AF37] pb-2 mb-3">Entregas do Projeto</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {deliverables.map((item, index) => (
+                <div key={index} className="flex items-center">
+                  <Check className="w-4 h-4 text-[#D4AF37] mr-2" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-medium border-b border-[#D4AF37] pb-2 mb-3">Valor de Negócio</h3>
+            <div className="space-y-2">
+              {businessValues.map((value, index) => (
+                <div key={index} className="flex items-start">
+                  <TrendingUp className="w-4 h-4 text-[#D4AF37] mr-2 mt-1" />
+                  <span>{value}</span>
                 </div>
               ))}
             </div>
@@ -379,11 +589,38 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
                 <span className="font-medium">Implementação:</span>
                 <span className="font-bold">R$ {totalPrice.implementation.toLocaleString('pt-BR')}</span>
               </div>
+              
+              {state.discount > 0 && (
+                <>
+                  <div className="flex justify-between text-sm text-gray-400">
+                    <span>Valor Original:</span>
+                    <span className="line-through">R$ {totalPrice.originalImplementation.toLocaleString('pt-BR')}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-[#D4AF37]">
+                    <span>Desconto ({state.discount}%):</span>
+                    <span>- R$ {totalPrice.discountAmount.toLocaleString('pt-BR')}</span>
+                  </div>
+                </>
+              )}
+              
               <div className="flex justify-between">
                 <span className="font-medium">Mensalidade (20%):</span>
                 <span className="font-bold">R$ {totalPrice.monthly.toLocaleString('pt-BR')}</span>
               </div>
+              
+              <div className="text-xs text-gray-400 mt-1">
+                * A mensalidade é calculada como 20% do valor original de implementação, sem aplicação de descontos.
+              </div>
             </div>
+          </div>
+          
+          <div>
+            <h3 className="text-xl font-medium border-b border-[#D4AF37] pb-2 mb-3">Condições Comerciais</h3>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Prazo de implementação: 30 dias corridos</li>
+              <li>Forma de pagamento da implementação: 40% de entrada + 60% na entrega</li>
+              <li>Mensalidade: Cobrada mensalmente após a conclusão da implementação</li>
+            </ul>
           </div>
           
           {state.notes && (

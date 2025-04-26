@@ -998,120 +998,398 @@ export const calculateTotalPrice = (state: CalculatorState) => {
     }
   });
   
-  // Apply discount if any
+  // Calculate original implementation price before discount
+  const originalImplementationPrice = implementationTotal;
+  
+  // Apply discount if any - ONLY to implementation, not to monthly fee
   if (state.discount && state.discount > 0) {
     implementationTotal = implementationTotal * (1 - state.discount / 100);
   }
   
-  // Calculate monthly fee (20% of implementation price)
-  const monthlyFee = Math.round(implementationTotal * 0.2);
+  // Calculate monthly fee (20% of original implementation price - NO DISCOUNT)
+  const monthlyFee = Math.round(originalImplementationPrice * 0.2);
   
   return {
     implementation: Math.round(implementationTotal),
-    monthly: monthlyFee
+    monthly: monthlyFee,
+    originalImplementation: Math.round(originalImplementationPrice),
+    discountAmount: Math.round(originalImplementationPrice - implementationTotal)
   };
 };
 
-// Generate implementation timeline
+// Generate implementation timeline - adjusted to fit within 30 days
 export const generateImplementationTimeline = (state: CalculatorState) => {
+  // Base tasks that are always needed
   const tasks = [
     {
-      phase: "Planejamento",
-      days: 5,
-      description: "Levantamento de requisitos e definição do escopo detalhado."
+      phase: "Planejamento e Análise",
+      days: 3,
+      description: "Levantamento detalhado de requisitos e definição do escopo do projeto."
     },
     {
       phase: "Configuração de Ambiente",
-      days: 3,
-      description: "Preparação de servidores, banco de dados e ambiente de desenvolvimento."
+      days: 2,
+      description: "Preparação dos servidores, bancos de dados e ambiente de desenvolvimento."
     }
   ];
   
-  // Add tasks based on selected modules
+  // Group modules by type for better timeline organization
+  const communicationModules = state.selectedModules.filter(m => 
+    ["WhatsApp", "Disparador de Mensagens / Captação"].includes(m.name)
+  );
+  
+  const dataModules = state.selectedModules.filter(m => 
+    ["Banco de Dados", "Análise de Dados + Dashboard"].includes(m.name)
+  );
+  
+  const integrationModules = state.selectedModules.filter(m => 
+    ["Integração ERP", "Integração CRM", "Google Drive Connector"].includes(m.name)
+  );
+  
+  const aiModules = state.selectedModules.filter(m => 
+    ["IA Avançada & Prompt Studio", "RAG / Base de Conhecimento"].includes(m.name)
+  );
+  
+  const automationModules = state.selectedModules.filter(m => 
+    ["Lembretes & Automação Follow-up", "Outro"].includes(m.name)
+  );
+  
+  // Calculate total complexity to adjust timelines
+  let totalComplexity = 0;
   state.selectedModules.forEach(module => {
-    let complexity = 1;
-    if (module.level === "M") complexity = 1.5;
-    if (module.level === "A") complexity = 2;
-    
-    switch(module.name) {
-      case "WhatsApp":
-        tasks.push({
-          phase: "Implementação WhatsApp",
-          days: Math.round(7 * complexity),
-          description: "Configuração da API, desenvolvimento de fluxos e testes."
-        });
-        break;
-      case "Banco de Dados":
-        tasks.push({
-          phase: "Implementação Banco de Dados",
-          days: Math.round(5 * complexity),
-          description: "Modelagem, criação de tabelas e configuração de acesso."
-        });
-        break;
-      case "IA Avançada & Prompt Studio":
-        tasks.push({
-          phase: "Implementação IA",
-          days: Math.round(10 * complexity),
-          description: "Desenvolvimento de modelos, treinamento e integração."
-        });
-        break;
-      case "Integração ERP":
-        tasks.push({
-          phase: "Integração ERP",
-          days: Math.round(8 * complexity),
-          description: "Desenvolvimento de conectores e mapas de dados."
-        });
-        break;
-      case "Integração CRM":
-        tasks.push({
-          phase: "Integração CRM",
-          days: Math.round(6 * complexity),
-          description: "Configuração de sincronização e fluxos de dados."
-        });
-        break;
-      default:
-        tasks.push({
-          phase: `Implementação ${module.name}`,
-          days: Math.round(5 * complexity),
-          description: "Desenvolvimento, configuração e testes."
-        });
-    }
+    if (module.level === "I") totalComplexity += 1;
+    else if (module.level === "M") totalComplexity += 2;
+    else if (module.level === "A") totalComplexity += 3;
   });
+  
+  // Dynamic timeline based on module groups
+  if (communicationModules.length > 0) {
+    let maxLevel = 0;
+    communicationModules.forEach(m => {
+      if (m.level === "M") maxLevel = Math.max(maxLevel, 1);
+      if (m.level === "A") maxLevel = Math.max(maxLevel, 2);
+    });
+    
+    tasks.push({
+      phase: "Implementação Canais de Comunicação",
+      days: 3 + maxLevel * 2,
+      description: `Configuração e desenvolvimento dos módulos ${communicationModules.map(m => m.name).join(", ")}.`
+    });
+  }
+  
+  if (dataModules.length > 0) {
+    let maxLevel = 0;
+    dataModules.forEach(m => {
+      if (m.level === "M") maxLevel = Math.max(maxLevel, 1);
+      if (m.level === "A") maxLevel = Math.max(maxLevel, 2);
+    });
+    
+    tasks.push({
+      phase: "Implementação Estrutura de Dados",
+      days: 4 + maxLevel * 2,
+      description: `Modelagem, criação de tabelas e configuração dos módulos ${dataModules.map(m => m.name).join(", ")}.`
+    });
+  }
+  
+  if (integrationModules.length > 0) {
+    let maxLevel = 0;
+    integrationModules.forEach(m => {
+      if (m.level === "M") maxLevel = Math.max(maxLevel, 1);
+      if (m.level === "A") maxLevel = Math.max(maxLevel, 2);
+    });
+    
+    tasks.push({
+      phase: "Implementação Integrações",
+      days: 5 + maxLevel * 2,
+      description: `Desenvolvimento de conectores e configuração dos módulos ${integrationModules.map(m => m.name).join(", ")}.`
+    });
+  }
+  
+  if (aiModules.length > 0) {
+    let maxLevel = 0;
+    aiModules.forEach(m => {
+      if (m.level === "M") maxLevel = Math.max(maxLevel, 1);
+      if (m.level === "A") maxLevel = Math.max(maxLevel, 2);
+    });
+    
+    tasks.push({
+      phase: "Implementação Inteligência Artificial",
+      days: 6 + maxLevel * 2,
+      description: `Configuração, treinamento e integração dos módulos ${aiModules.map(m => m.name).join(", ")}.`
+    });
+  }
+  
+  if (automationModules.length > 0) {
+    let maxLevel = 0;
+    automationModules.forEach(m => {
+      if (m.level === "M") maxLevel = Math.max(maxLevel, 1);
+      if (m.level === "A") maxLevel = Math.max(maxLevel, 2);
+    });
+    
+    tasks.push({
+      phase: "Implementação Automações",
+      days: 3 + maxLevel * 2,
+      description: `Desenvolvimento dos fluxos automatizados para ${automationModules.map(m => m.name).join(", ")}.`
+    });
+  }
   
   // Add final tasks
   tasks.push(
     {
-      phase: "Testes e Qualidade",
-      days: 5,
-      description: "Testes de integração, performance e correção de bugs."
+      phase: "Testes Integrados",
+      days: 4,
+      description: "Testes de integração entre módulos, validação de fluxos e correção de bugs."
     },
     {
       phase: "Treinamento e Documentação",
       days: 3,
-      description: "Capacitação da equipe e documentação do sistema."
+      description: "Capacitação da equipe e documentação completa do sistema."
     },
     {
-      phase: "Deploy e Go-live",
+      phase: "Deploy e Go-Live",
       days: 2,
       description: "Implantação em produção e acompanhamento inicial."
     }
   );
   
   // Calculate total days
-  const totalDays = tasks.reduce((sum, task) => sum + task.days, 0);
+  let totalDays = tasks.reduce((sum, task) => sum + task.days, 0);
+  
+  // Adjust to fit in 30 days if needed
+  if (totalDays > 30) {
+    const compressionFactor = 30 / totalDays;
+    tasks.forEach(task => {
+      task.days = Math.max(1, Math.floor(task.days * compressionFactor));
+    });
+    totalDays = tasks.reduce((sum, task) => sum + task.days, 0);
+    
+    // If still over 30, adjust the largest tasks
+    if (totalDays > 30) {
+      const daysToReduce = totalDays - 30;
+      tasks.sort((a, b) => b.days - a.days);
+      
+      for (let i = 0; i < daysToReduce; i++) {
+        if (tasks[i % tasks.length].days > 1) {
+          tasks[i % tasks.length].days -= 1;
+        }
+      }
+      
+      // Resort tasks by their original order
+      tasks.sort((a, b) => {
+        const phaseOrder = [
+          "Planejamento e Análise",
+          "Configuração de Ambiente",
+          "Implementação Canais de Comunicação",
+          "Implementação Estrutura de Dados",
+          "Implementação Integrações",
+          "Implementação Inteligência Artificial",
+          "Implementação Automações",
+          "Testes Integrados",
+          "Treinamento e Documentação",
+          "Deploy e Go-Live"
+        ];
+        return phaseOrder.indexOf(a.phase) - phaseOrder.indexOf(b.phase);
+      });
+    }
+  }
+  
+  // Calculate total days after adjustments
+  totalDays = tasks.reduce((sum, task) => sum + task.days, 0);
   
   return { tasks, totalDays };
 };
 
-// Generate commercial proposal text
+// Generate module scope details based on selected modules and their levels
+export const generateModuleScope = (state: CalculatorState) => {
+  const moduleDetails: Record<ModuleName, Record<ModuleLevel, string>> = {
+    "WhatsApp": {
+      "I": "Automação de respostas para mensagens básicas, atendimento inicial automatizado.",
+      "M": "Fluxos conversacionais avançados, qualificação de leads, transferência para atendente.",
+      "A": "Integração completa com CRM, personalização avançada, análise de sentimento, chatbot multilingual."
+    },
+    "Disparador de Mensagens / Captação": {
+      "I": "Envio de mensagens em massa para listas predefinidas, templates básicos.",
+      "M": "Segmentação de listas, personalização de mensagens, agendamento de campanhas.",
+      "A": "Automação completa de funis, triggers comportamentais, A/B testing, métricas avançadas."
+    },
+    "Banco de Dados": {
+      "I": "Estrutura básica para armazenamento de dados, consultas simples.",
+      "M": "Modelagem relacional completa, otimização de consultas, backup automático.",
+      "A": "Bancos NoSQL, redundância, alta disponibilidade, sistemas distribuídos."
+    },
+    "IA Avançada & Prompt Studio": {
+      "I": "Assistente virtual com respostas baseadas em conhecimento predefinido.",
+      "M": "Análise de padrões, reconhecimento de entidades, processamento de linguagem natural.",
+      "A": "Modelos customizados, aprendizado contínuo, análise multimodal (texto, imagem, áudio)."
+    },
+    "Integração ERP": {
+      "I": "Sincronização básica de dados entre sistemas, importação/exportação agendada.",
+      "M": "Integração bidirecional em tempo real, mapeamento avançado de dados.",
+      "A": "Orquestração complexa, tratamento de exceções, validações customizadas."
+    },
+    "Integração CRM": {
+      "I": "Sincronização de contatos e leads, atualização de status.",
+      "M": "Automação de jornadas de cliente, scoring de leads, histórico de interações.",
+      "A": "Customer journey completa, previsão de comportamento, integração omnichannel."
+    },
+    "RAG / Base de Conhecimento": {
+      "I": "Repositório de documentos com busca textual, categorização básica.",
+      "M": "Indexação semântica, perguntas e respostas, busca contextual.",
+      "A": "Aprendizado contínuo, análise de documentos multilingue, extração de insights."
+    },
+    "Google Drive Connector": {
+      "I": "Acesso a documentos armazenados no Drive, upload/download básico.",
+      "M": "Sincronização automática, conversão de formatos, organização dinâmica.",
+      "A": "Controle granular de permissões, versionamento, integração com workflows."
+    },
+    "Análise de Dados + Dashboard": {
+      "I": "Dashboard com métricas básicas, relatórios estáticos.",
+      "M": "Visualizações interativas, filtros dinâmicos, exportação de relatórios.",
+      "A": "Business Intelligence completo, previsões, alertas inteligentes, KPIs customizáveis."
+    },
+    "Lembretes & Automação Follow-up": {
+      "I": "Lembretes programados, notificações básicas.",
+      "M": "Sequências de follow-up, gatilhos baseados em comportamento.",
+      "A": "Jornadas complexas, personalização avançada, otimização baseada em respostas."
+    },
+    "Outro": {
+      "I": "Desenvolvimento básico customizado conforme necessidade.",
+      "M": "Desenvolvimento intermediário com maior personalização.",
+      "A": "Desenvolvimento complexo totalmente customizado para necessidades específicas."
+    }
+  };
+  
+  const scopeDetails: {module: string; level: string; description: string}[] = [];
+  
+  state.selectedModules.forEach(module => {
+    if (module.level) {
+      const levelLabel = module.level === "I" ? "Iniciante" : module.level === "M" ? "Intermediário" : "Avançado";
+      const description = moduleDetails[module.name][module.level];
+      
+      scopeDetails.push({
+        module: module.name,
+        level: levelLabel,
+        description
+      });
+    }
+  });
+  
+  return scopeDetails;
+};
+
+// Generate project deliverables based on selected modules
+export const generateDeliverables = (state: CalculatorState) => {
+  const baseDeliverables = [
+    "Manual de usuário",
+    "Documentação técnica",
+    "Treinamento inicial da equipe"
+  ];
+  
+  const moduleDeliverables: Record<ModuleName, string[]> = {
+    "WhatsApp": ["Fluxos de conversação configurados", "Integração ativa com WhatsApp Business API"],
+    "Disparador de Mensagens / Captação": ["Templates de mensagens", "Segmentação de listas"],
+    "Banco de Dados": ["Modelo de dados", "Esquema de backup", "Políticas de segurança"],
+    "IA Avançada & Prompt Studio": ["Conjuntos de prompts", "Guia de uso para IA"],
+    "Integração ERP": ["Mapeamento de campos", "Documentação de interfaces"],
+    "Integração CRM": ["Workflow de leads", "Mapeamento de jornada do cliente"],
+    "RAG / Base de Conhecimento": ["Base de conhecimento indexada", "Motor de busca semântica"],
+    "Google Drive Connector": ["Estrutura de pastas", "Configuração de sincronização"],
+    "Análise de Dados + Dashboard": ["Dashboards configurados", "Relatórios automatizados"],
+    "Lembretes & Automação Follow-up": ["Fluxos de automação", "Templates de notificação"],
+    "Outro": ["Especificação detalhada", "Documentação personalizada"]
+  };
+  
+  const deliverables = [...baseDeliverables];
+  
+  state.selectedModules.forEach(module => {
+    if (moduleDeliverables[module.name]) {
+      deliverables.push(...moduleDeliverables[module.name]);
+    }
+  });
+  
+  // Remove duplicates and sort
+  return Array.from(new Set(deliverables)).sort();
+};
+
+// Generate business value by module
+export const generateBusinessValue = (state: CalculatorState) => {
+  const moduleBusinessValue: Record<ModuleName, string[]> = {
+    "WhatsApp": [
+      "Redução de 60% no tempo de resposta ao cliente",
+      "Aumento de 35% na taxa de resolução no primeiro contato"
+    ],
+    "Disparador de Mensagens / Captação": [
+      "Aumento de 40% na taxa de conversão de leads",
+      "Redução de 30% no custo de aquisição de clientes"
+    ],
+    "Banco de Dados": [
+      "Centralização completa da informação do negócio",
+      "Redução de 50% no tempo de acesso aos dados"
+    ],
+    "IA Avançada & Prompt Studio": [
+      "Automação de 70% das interações repetitivas",
+      "Melhoria de 45% na satisfação do cliente"
+    ],
+    "Integração ERP": [
+      "Redução de 80% em erros de entrada de dados",
+      "Aceleração de 60% nos processos administrativos"
+    ],
+    "Integração CRM": [
+      "Visão 360° do cliente em uma única plataforma",
+      "Aumento de 25% nas vendas por upsell/cross-sell"
+    ],
+    "RAG / Base de Conhecimento": [
+      "Redução de 40% no tempo de treinamento",
+      "Melhoria de 50% na consistência de respostas"
+    ],
+    "Google Drive Connector": [
+      "Redução de 35% no tempo de gestão documental",
+      "Eliminação de 90% dos arquivos duplicados"
+    ],
+    "Análise de Dados + Dashboard": [
+      "Tomada de decisão baseada em dados em tempo real",
+      "Identificação proativa de oportunidades de negócio"
+    ],
+    "Lembretes & Automação Follow-up": [
+      "Eliminação de 95% dos follow-ups esquecidos",
+      "Aumento de 30% na taxa de recompra de clientes"
+    ],
+    "Outro": [
+      "Solução personalizada alinhada às necessidades específicas",
+      "Vantagem competitiva através de tecnologia customizada"
+    ]
+  };
+  
+  const businessValues: string[] = [];
+  
+  state.selectedModules.forEach(module => {
+    if (moduleBusinessValue[module.name]) {
+      businessValues.push(...moduleBusinessValue[module.name]);
+    }
+  });
+  
+  // Remove duplicates
+  return Array.from(new Set(businessValues));
+};
+
+// Generate commercial proposal
 export const generateCommercialProposal = (state: CalculatorState) => {
   const clientName = state.clientName || "Cliente";
   const companyName = state.companyName || "Empresa";
   const totalPrice = calculateTotalPrice(state);
   const timeline = generateImplementationTimeline(state);
+  const scopeDetails = generateModuleScope(state);
+  const deliverables = generateDeliverables(state);
+  const businessValues = generateBusinessValue(state);
+  
+  // Format date for the proposal
+  const now = new Date();
+  const formattedDate = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear()}`;
   
   return `
 PROPOSTA COMERCIAL - TARS AI
+
+Data: ${formattedDate}
 
 Prezado(a) ${clientName},
 
@@ -1121,27 +1399,39 @@ Agradecemos a oportunidade de apresentar nossa proposta para o desenvolvimento d
 
 ${state.projectDescription || "Desenvolvimento e implementação de uma solução personalizada de automação utilizando inteligência artificial."}
 
-2. MÓDULOS INCLUÍDOS
+2. DETALHAMENTO DOS MÓDULOS
 
-${state.selectedModules.map(module => {
-  const level = module.level === "I" ? "Nível Iniciante" : module.level === "M" ? "Nível Intermediário" : "Nível Avançado";
-  return `- ${module.name} (${level})`;
-}).join("\n")}
+${scopeDetails.map(detail => `- ${detail.module} (${detail.level}): ${detail.description}`).join("\n")}
 
-3. CRONOGRAMA DE IMPLEMENTAÇÃO
+3. CRONOGRAMA DE IMPLEMENTAÇÃO - 30 DIAS
 
-Prazo total estimado: ${timeline.totalDays} dias
+Prazo total: ${timeline.totalDays} dias
 
-${timeline.tasks.map((task, index) => `${index + 1}. ${task.phase} - ${task.days} dias`).join("\n")}
+${timeline.tasks.map((task, index) => `${index + 1}. ${task.phase} - ${task.days} dias - ${task.description}`).join("\n")}
 
-4. INVESTIMENTO
+4. ENTREGAS DO PROJETO
+
+${deliverables.map(item => `- ${item}`).join("\n")}
+
+5. VALOR DE NEGÓCIO
+
+${businessValues.map(value => `- ${value}`).join("\n")}
+
+6. INVESTIMENTO
 
 - Implementação: R$ ${totalPrice.implementation.toLocaleString('pt-BR')}
+${totalPrice.discountAmount > 0 ? `  * Valor original: R$ ${totalPrice.originalImplementation.toLocaleString('pt-BR')}` : ""}
+${totalPrice.discountAmount > 0 ? `  * Desconto aplicado: R$ ${totalPrice.discountAmount.toLocaleString('pt-BR')} (${state.discount}%)` : ""}
+
 - Mensalidade (manutenção e suporte): R$ ${totalPrice.monthly.toLocaleString('pt-BR')}
 
-${state.discount ? `* Foi aplicado um desconto de ${state.discount}% sobre o valor de implementação.` : ""}
+7. CONDIÇÕES COMERCIAIS
 
-${state.notes ? `OBSERVAÇÕES:\n${state.notes}` : ""}
+- Prazo de implementação: 30 dias corridos
+- Forma de pagamento da implementação: 40% de entrada + 60% na entrega
+- Mensalidade: Cobrada mensalmente após a conclusão da implementação
+
+${state.notes ? `8. OBSERVAÇÕES:\n${state.notes}` : ""}
 
 Estamos à disposição para esclarecer quaisquer dúvidas.
 

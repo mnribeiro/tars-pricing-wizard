@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { 
   CalculatorState,
@@ -22,7 +21,8 @@ import {
   availableModules,
   calculateTotalPrice,
   generateImplementationTimeline,
-  generateCommercialProposal
+  generateCommercialProposal,
+  Segment
 } from "@/types/calculator";
 import SelectableCard from "./SelectableCard";
 import ComplexitySelector from "./ComplexitySelector";
@@ -44,10 +44,16 @@ const PricingCalculator = () => {
   
   // Estado da calculadora
   const [state, setState] = useState<CalculatorState>({
+    currentStep: 1,
     clientName: "",
     companyName: "",
     clientPhone: "",
+    projectDescription: "",
     initialIdea: "",
+    selectedSegment: null,
+    selectedSubNiche: null,
+    selectedDepartment: null,
+    selectedModules: [],
     selectedNiche: null,
     nicheUnits: 1,
     selectedIndustryArea: null,
@@ -57,7 +63,8 @@ const PricingCalculator = () => {
     selectedAIFeatures: [],
     selectedAITraining: null,
     selectedAITools: [],
-    selectedModules: []
+    notes: "",
+    discount: 0
   });
 
   // Estado para controlar quais módulos estão com seletor de complexidade aberto
@@ -279,7 +286,13 @@ const PricingCalculator = () => {
           ...prev,
           selectedModules: [
             ...prev.selectedModules,
-            { name: moduleName, basePrice, complexity: null }
+            { 
+              name: moduleName, 
+              basePrice, 
+              level: null,
+              available: true,
+              complexity: null as ComplexityLevel | null
+            }
           ]
         };
       }
