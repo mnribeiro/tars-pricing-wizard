@@ -1,14 +1,5 @@
-
 import { useState } from "react";
-import { 
-  CalculatorState, 
-  Department, 
-  Module, 
-  ModuleLevel, 
-  ModuleName, 
-  Segment, 
-  SubNiche 
-} from "@/types/calculator";
+import { CalculatorState, Department, Module, ModuleLevel, ModuleName, Segment, SubNiche } from "@/types/calculator";
 import SegmentSelector from "./SegmentSelector";
 import SubNicheSelector from "./SubNicheSelector";
 import DepartmentSelector from "./DepartmentSelector";
@@ -17,7 +8,6 @@ import ClientInfoForm from "./ClientInfoForm";
 import SummaryAndProposal from "./SummaryAndProposal";
 import { Button } from "./ui/button";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-
 const PricingWizard = () => {
   // Initialize calculator state
   const [state, setState] = useState<CalculatorState>({
@@ -49,17 +39,22 @@ const PricingWizard = () => {
         ...prev,
         currentStep: prev.currentStep + 1
       }));
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
     }
   };
-
   const goToPreviousStep = () => {
     if (state.currentStep > 1) {
       setState(prev => ({
         ...prev,
         currentStep: prev.currentStep - 1
       }));
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
     }
   };
 
@@ -67,11 +62,7 @@ const PricingWizard = () => {
   const canProceed = (): boolean => {
     switch (state.currentStep) {
       case 1:
-        return (
-          state.clientName.trim() !== "" &&
-          state.companyName.trim() !== "" &&
-          state.clientPhone.trim() !== ""
-        );
+        return state.clientName.trim() !== "" && state.companyName.trim() !== "" && state.clientPhone.trim() !== "";
       case 2:
         return state.selectedSegment !== null;
       case 3:
@@ -79,8 +70,7 @@ const PricingWizard = () => {
       case 4:
         return state.selectedDepartment !== null;
       case 5:
-        return state.selectedModules.length > 0 && 
-               state.selectedModules.every(module => module.level !== null);
+        return state.selectedModules.length > 0 && state.selectedModules.every(module => module.level !== null);
       default:
         return true;
     }
@@ -121,7 +111,6 @@ const PricingWizard = () => {
     setState(prev => {
       // Check if the module is already selected
       const existingIndex = prev.selectedModules.findIndex(m => m.name === module.name);
-      
       if (existingIndex >= 0) {
         // Remove module if already selected
         return {
@@ -150,7 +139,6 @@ const PricingWizard = () => {
         }
         return module;
       });
-      
       return {
         ...prev,
         selectedModules: updatedModules
@@ -162,64 +150,17 @@ const PricingWizard = () => {
   const renderStepContent = () => {
     switch (state.currentStep) {
       case 1:
-        return (
-          <ClientInfoForm
-            state={state}
-            updateField={updateField}
-            className="animate-fade-in"
-          />
-        );
+        return <ClientInfoForm state={state} updateField={updateField} className="animate-fade-in" />;
       case 2:
-        return (
-          <SegmentSelector
-            selectedSegment={state.selectedSegment}
-            onSelect={handleSegmentSelect}
-            className="animate-fade-in"
-          />
-        );
+        return <SegmentSelector selectedSegment={state.selectedSegment} onSelect={handleSegmentSelect} className="animate-fade-in" />;
       case 3:
-        return state.selectedSegment ? (
-          <SubNicheSelector
-            selectedSegment={state.selectedSegment}
-            selectedSubNiche={state.selectedSubNiche}
-            onSelect={handleSubNicheSelect}
-            className="animate-fade-in"
-          />
-        ) : (
-          <div>Por favor, selecione um segmento primeiro.</div>
-        );
+        return state.selectedSegment ? <SubNicheSelector selectedSegment={state.selectedSegment} selectedSubNiche={state.selectedSubNiche} onSelect={handleSubNicheSelect} className="animate-fade-in" /> : <div>Por favor, selecione um segmento primeiro.</div>;
       case 4:
-        return state.selectedSegment && state.selectedSubNiche ? (
-          <DepartmentSelector
-            selectedSegment={state.selectedSegment}
-            selectedSubNiche={state.selectedSubNiche}
-            selectedDepartment={state.selectedDepartment}
-            onSelect={handleDepartmentSelect}
-            className="animate-fade-in"
-          />
-        ) : (
-          <div>Por favor, selecione um segmento e subnicho primeiro.</div>
-        );
+        return state.selectedSegment && state.selectedSubNiche ? <DepartmentSelector selectedSegment={state.selectedSegment} selectedSubNiche={state.selectedSubNiche} selectedDepartment={state.selectedDepartment} onSelect={handleDepartmentSelect} className="animate-fade-in" /> : <div>Por favor, selecione um segmento e subnicho primeiro.</div>;
       case 5:
-        return state.selectedDepartment ? (
-          <ModuleSelector
-            selectedDepartment={state.selectedDepartment}
-            selectedModules={state.selectedModules}
-            onToggleModule={handleToggleModule}
-            onUpdateModuleLevel={handleUpdateModuleLevel}
-            className="animate-fade-in"
-          />
-        ) : (
-          <div>Por favor, selecione um departamento primeiro.</div>
-        );
+        return state.selectedDepartment ? <ModuleSelector selectedDepartment={state.selectedDepartment} selectedModules={state.selectedModules} onToggleModule={handleToggleModule} onUpdateModuleLevel={handleUpdateModuleLevel} className="animate-fade-in" /> : <div>Por favor, selecione um departamento primeiro.</div>;
       case 6:
-        return (
-          <SummaryAndProposal
-            state={state}
-            updateField={updateField}
-            className="animate-fade-in"
-          />
-        );
+        return <SummaryAndProposal state={state} updateField={updateField} className="animate-fade-in" />;
       default:
         return <div>Passo não encontrado</div>;
     }
@@ -233,24 +174,29 @@ const PricingWizard = () => {
   };
 
   // Step titles
-  const steps = [
-    { number: 1, title: "Dados do Cliente" },
-    { number: 2, title: "Segmento" },
-    { number: 3, title: "Subnicho" },
-    { number: 4, title: "Departamento" },
-    { number: 5, title: "Módulos" },
-    { number: 6, title: "Proposta" }
-  ];
-
-  return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
+  const steps = [{
+    number: 1,
+    title: "Dados do Cliente"
+  }, {
+    number: 2,
+    title: "Segmento"
+  }, {
+    number: 3,
+    title: "Subnicho"
+  }, {
+    number: 4,
+    title: "Departamento"
+  }, {
+    number: 5,
+    title: "Módulos"
+  }, {
+    number: 6,
+    title: "Proposta"
+  }];
+  return <div className="container max-w-4xl mx-auto py-8 px-4">
       <div className="mb-8">
         <div className="flex justify-center mb-6">
-          <img 
-            src="/lovable-uploads/4f1d932f-59a0-44cd-aceb-0b10faf8f429.png" 
-            alt="TARS AI" 
-            className="h-16"
-          />
+          <img alt="TARS AI" src="/lovable-uploads/75fedcf6-2c1f-4b1e-aebb-f8386253fd76.jpg" className="h-16 object-contain" />
         </div>
         <h1 className="text-3xl font-bold text-center mb-2">Calculadora de Precificação</h1>
         <p className="text-center text-gray-300">Configure sua solução personalizada</p>
@@ -259,34 +205,15 @@ const PricingWizard = () => {
       {/* Progress Steps */}
       <div className="mb-8">
         <div className="hidden md:flex justify-between">
-          {steps.map((step) => {
-            const status = getStepStatus(step.number);
-            return (
-              <div 
-                key={step.number} 
-                className={`flex flex-col items-center w-1/6 ${
-                  status === "upcoming" ? "opacity-50" : ""
-                }`}
-              >
-                <div 
-                  className={`w-8 h-8 flex items-center justify-center rounded-full mb-1 ${
-                    status === "completed" 
-                      ? "bg-[#D4AF37] text-white" 
-                      : status === "current"
-                      ? "border-2 border-[#D4AF37] text-[#D4AF37]"
-                      : "border border-gray-500 text-gray-500"
-                  }`}
-                >
-                  {status === "completed" ? (
-                    <Check size={16} />
-                  ) : (
-                    <span>{step.number}</span>
-                  )}
+          {steps.map(step => {
+          const status = getStepStatus(step.number);
+          return <div key={step.number} className={`flex flex-col items-center w-1/6 ${status === "upcoming" ? "opacity-50" : ""}`}>
+                <div className={`w-8 h-8 flex items-center justify-center rounded-full mb-1 ${status === "completed" ? "bg-[#D4AF37] text-white" : status === "current" ? "border-2 border-[#D4AF37] text-[#D4AF37]" : "border border-gray-500 text-gray-500"}`}>
+                  {status === "completed" ? <Check size={16} /> : <span>{step.number}</span>}
                 </div>
                 <span className="text-xs text-center">{step.title}</span>
-              </div>
-            );
-          })}
+              </div>;
+        })}
         </div>
         
         {/* Mobile Progress */}
@@ -299,10 +226,9 @@ const PricingWizard = () => {
           </span>
         </div>
         <div className="h-2 bg-gray-700 rounded-full mt-2 mb-6 md:hidden">
-          <div 
-            className="h-2 bg-[#D4AF37] rounded-full transition-all duration-300" 
-            style={{ width: `${(state.currentStep / steps.length) * 100}%` }}
-          />
+          <div className="h-2 bg-[#D4AF37] rounded-full transition-all duration-300" style={{
+          width: `${state.currentStep / steps.length * 100}%`
+        }} />
         </div>
       </div>
 
@@ -313,35 +239,14 @@ const PricingWizard = () => {
 
       {/* Navigation Buttons */}
       <div className="flex justify-between">
-        <Button
-          variant="outline"
-          onClick={goToPreviousStep}
-          disabled={state.currentStep === 1}
-          className={`${
-            state.currentStep === 1 
-              ? "opacity-0 cursor-default" 
-              : "border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
-          }`}
-        >
+        <Button variant="outline" onClick={goToPreviousStep} disabled={state.currentStep === 1} className={`${state.currentStep === 1 ? "opacity-0 cursor-default" : "border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"}`}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
         </Button>
         
-        {state.currentStep < steps.length ? (
-          <Button
-            onClick={goToNextStep}
-            disabled={!canProceed()}
-            className={`${
-              canProceed() 
-                ? "bg-[#D4AF37] hover:bg-[#B39020] text-white" 
-                : "bg-gray-700 text-gray-300 cursor-not-allowed"
-            }`}
-          >
+        {state.currentStep < steps.length ? <Button onClick={goToNextStep} disabled={!canProceed()} className={`${canProceed() ? "bg-[#D4AF37] hover:bg-[#B39020] text-white" : "bg-gray-700 text-gray-300 cursor-not-allowed"}`}>
             Próximo <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        ) : null}
+          </Button> : null}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default PricingWizard;
