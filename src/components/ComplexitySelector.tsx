@@ -28,8 +28,8 @@ const ComplexitySelector = ({
           className={cn(
             "complexity-btn px-3 py-2 rounded-md text-sm font-medium border-2 transition-all duration-200",
             selected === level
-              ? "border-tars-highlight text-tars-highlight-foreground bg-tars-highlight"
-              : "border-border hover:border-tars-highlight/50 hover:bg-tars-highlight/10"
+              ? "border-[#D4AF37] bg-[#D4AF37]/10"
+              : "border-border hover:border-[#D4AF37]/50 hover:bg-[#D4AF37]/10"
           )}
         >
           <div className="flex flex-col items-center gap-1">
