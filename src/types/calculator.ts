@@ -1,4 +1,3 @@
-
 // Basic Types
 export type ComplexityLevel = "easy" | "normal" | "complex";
 
@@ -971,4 +970,183 @@ export const getAvailableModules = (department: Department): ModuleName[] => {
   return modulesData
     .filter(module => module.departmentAvailability[department])
     .map(module => module.name);
+};
+
+// Calculate the total price based on selected options
+export const calculateTotalPrice = (state: CalculatorState) => {
+  let implementationTotal = 0;
+  
+  // Add base price for segment if selected
+  if (state.selectedSegment) {
+    const segment = segmentsData.find(s => s.name === state.selectedSegment);
+    implementationTotal += segment ? segment.basePrice : 0;
+    
+    // Add sub-niche price if selected
+    if (state.selectedSubNiche) {
+      const subNiche = segment?.subNiches.find(sn => sn.name === state.selectedSubNiche);
+      implementationTotal += subNiche ? subNiche.basePrice : 0;
+    }
+  }
+  
+  // Add prices for each selected module
+  state.selectedModules.forEach(module => {
+    if (module.level) {
+      const moduleData = modulesData.find(m => m.name === module.name);
+      if (moduleData) {
+        implementationTotal += moduleData.prices[module.level];
+      }
+    }
+  });
+  
+  // Apply discount if any
+  if (state.discount && state.discount > 0) {
+    implementationTotal = implementationTotal * (1 - state.discount / 100);
+  }
+  
+  // Calculate monthly fee (20% of implementation price)
+  const monthlyFee = Math.round(implementationTotal * 0.2);
+  
+  return {
+    implementation: Math.round(implementationTotal),
+    monthly: monthlyFee
+  };
+};
+
+// Generate implementation timeline
+export const generateImplementationTimeline = (state: CalculatorState) => {
+  const tasks = [
+    {
+      phase: "Planejamento",
+      days: 5,
+      description: "Levantamento de requisitos e definição do escopo detalhado."
+    },
+    {
+      phase: "Configuração de Ambiente",
+      days: 3,
+      description: "Preparação de servidores, banco de dados e ambiente de desenvolvimento."
+    }
+  ];
+  
+  // Add tasks based on selected modules
+  state.selectedModules.forEach(module => {
+    let complexity = 1;
+    if (module.level === "M") complexity = 1.5;
+    if (module.level === "A") complexity = 2;
+    
+    switch(module.name) {
+      case "WhatsApp":
+        tasks.push({
+          phase: "Implementação WhatsApp",
+          days: Math.round(7 * complexity),
+          description: "Configuração da API, desenvolvimento de fluxos e testes."
+        });
+        break;
+      case "Banco de Dados":
+        tasks.push({
+          phase: "Implementação Banco de Dados",
+          days: Math.round(5 * complexity),
+          description: "Modelagem, criação de tabelas e configuração de acesso."
+        });
+        break;
+      case "IA Avançada & Prompt Studio":
+        tasks.push({
+          phase: "Implementação IA",
+          days: Math.round(10 * complexity),
+          description: "Desenvolvimento de modelos, treinamento e integração."
+        });
+        break;
+      case "Integração ERP":
+        tasks.push({
+          phase: "Integração ERP",
+          days: Math.round(8 * complexity),
+          description: "Desenvolvimento de conectores e mapas de dados."
+        });
+        break;
+      case "Integração CRM":
+        tasks.push({
+          phase: "Integração CRM",
+          days: Math.round(6 * complexity),
+          description: "Configuração de sincronização e fluxos de dados."
+        });
+        break;
+      default:
+        tasks.push({
+          phase: `Implementação ${module.name}`,
+          days: Math.round(5 * complexity),
+          description: "Desenvolvimento, configuração e testes."
+        });
+    }
+  });
+  
+  // Add final tasks
+  tasks.push(
+    {
+      phase: "Testes e Qualidade",
+      days: 5,
+      description: "Testes de integração, performance e correção de bugs."
+    },
+    {
+      phase: "Treinamento e Documentação",
+      days: 3,
+      description: "Capacitação da equipe e documentação do sistema."
+    },
+    {
+      phase: "Deploy e Go-live",
+      days: 2,
+      description: "Implantação em produção e acompanhamento inicial."
+    }
+  );
+  
+  // Calculate total days
+  const totalDays = tasks.reduce((sum, task) => sum + task.days, 0);
+  
+  return { tasks, totalDays };
+};
+
+// Generate commercial proposal text
+export const generateCommercialProposal = (state: CalculatorState) => {
+  const clientName = state.clientName || "Cliente";
+  const companyName = state.companyName || "Empresa";
+  const totalPrice = calculateTotalPrice(state);
+  const timeline = generateImplementationTimeline(state);
+  
+  return `
+PROPOSTA COMERCIAL - TARS AI
+
+Prezado(a) ${clientName},
+
+Agradecemos a oportunidade de apresentar nossa proposta para o desenvolvimento de uma solução de automação inteligente para a ${companyName}.
+
+1. ESCOPO DO PROJETO
+
+${state.projectDescription || "Desenvolvimento e implementação de uma solução personalizada de automação utilizando inteligência artificial."}
+
+2. MÓDULOS INCLUÍDOS
+
+${state.selectedModules.map(module => {
+  const level = module.level === "I" ? "Nível Iniciante" : module.level === "M" ? "Nível Intermediário" : "Nível Avançado";
+  return `- ${module.name} (${level})`;
+}).join("\n")}
+
+3. CRONOGRAMA DE IMPLEMENTAÇÃO
+
+Prazo total estimado: ${timeline.totalDays} dias
+
+${timeline.tasks.map((task, index) => `${index + 1}. ${task.phase} - ${task.days} dias`).join("\n")}
+
+4. INVESTIMENTO
+
+- Implementação: R$ ${totalPrice.implementation.toLocaleString('pt-BR')}
+- Mensalidade (manutenção e suporte): R$ ${totalPrice.monthly.toLocaleString('pt-BR')}
+
+${state.discount ? `* Foi aplicado um desconto de ${state.discount}% sobre o valor de implementação.` : ""}
+
+${state.notes ? `OBSERVAÇÕES:\n${state.notes}` : ""}
+
+Estamos à disposição para esclarecer quaisquer dúvidas.
+
+Atenciosamente,
+
+Equipe TARS AI
+`;
 };
