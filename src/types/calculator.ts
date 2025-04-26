@@ -1,3 +1,4 @@
+
 // Basic Types
 export type ComplexityLevel = "easy" | "normal" | "complex";
 
@@ -943,4 +944,31 @@ export const modulesData: ModuleData[] = [
       "Planejamento": false,
       "Pedagógico": true,
       "Rotas": false,
-      "Entreg
+      "Entregas": true,
+      "Armazenagem": false,
+      "Distribuição": false
+    }
+  }
+];
+
+// Helper function to get sub-niches for a selected segment
+export const getSubNichesBySegment = (segment: Segment): SubNicheData[] => {
+  const segmentData = segmentsData.find(s => s.name === segment);
+  return segmentData ? segmentData.subNiches : [];
+};
+
+// Helper function to get departments for a selected segment and sub-niche
+export const getDepartmentsBySubNiche = (segment: Segment, subNiche: SubNiche): Department[] => {
+  const segmentData = segmentsData.find(s => s.name === segment);
+  if (!segmentData) return [];
+  
+  const subNicheData = segmentData.subNiches.find(sn => sn.name === subNiche);
+  return subNicheData ? subNicheData.departments : [];
+};
+
+// Helper function to get available modules for a department
+export const getAvailableModules = (department: Department): ModuleName[] => {
+  return modulesData
+    .filter(module => module.departmentAvailability[department])
+    .map(module => module.name);
+};
