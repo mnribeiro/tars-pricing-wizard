@@ -1,4 +1,3 @@
-
 // Basic Types
 export type ComplexityLevel = "easy" | "normal" | "complex";
 
@@ -7,6 +6,15 @@ export const complexityLevels = {
   normal: "Intermediário",
   complex: "Avançado"
 };
+
+// Types used in PricingCalculator.tsx
+export type BusinessNiche = "Saúde" | "Varejo" | "E-commerce" | "Franquias" | "Indústria" | "Serviços";
+export type IndustryArea = "Logística" | "Produção" | "Inteligência de Negócios" | "Envio de Relatórios";
+export type AutomationObjective = "Aumentar Vendas" | "Reduzir Custos" | "Melhorar Experiência" | "Otimizar Tempo" | "Inteligência Estratégica";
+export type AILevel = "IA Simples" | "IA Intermediária" | "IA Complexa";
+export type AIFeature = "Análise de Texto" | "Reconhecimento de Imagens" | "Análise Preditiva" | "Recomendação Personalizada" | "Classificação Automática" | "Detecção de Anomalias";
+export type AITraining = "Treinamento Básico" | "Treinamento Personalizado" | "Treinamento Avançado";
+export type AITool = "Prompt Studio" | "Monitoramento de IA" | "Ferramentas de Auditoria" | "Geração de Conteúdo" | "Painel de Controle IA";
 
 // New Structure Types
 export type Segment = 
@@ -40,6 +48,8 @@ export interface Module {
   basePrice: number;
   level: ModuleLevel | null;
   available: boolean;
+  // Add complexity to match PricingCalculator usage
+  complexity?: ComplexityLevel | null;
 }
 
 export interface SubNicheData {
@@ -77,7 +87,130 @@ export interface CalculatorState {
   selectedModules: Module[];
   notes: string;
   discount: number;
+  // Additional properties needed for PricingCalculator
+  initialIdea?: string;
+  selectedNiche?: BusinessNiche | null;
+  nicheUnits?: number;
+  selectedIndustryArea?: IndustryArea | null;
+  whatsappNumbers?: number;
+  selectedObjectives?: AutomationObjective[];
+  selectedAILevel?: AILevel | null;
+  selectedAIFeatures?: AIFeature[];
+  selectedAITraining?: AITraining | null;
+  selectedAITools?: AITool[];
 }
+
+// Data needed by PricingCalculator
+export const businessNiches = [
+  { name: "Saúde", basePrice: 2500 },
+  { name: "Varejo", basePrice: 2200 },
+  { name: "E-commerce", basePrice: 2200 },
+  { name: "Franquias", basePrice: 3000 },
+  { name: "Indústria", basePrice: 4000 },
+  { name: "Serviços", basePrice: 1800 }
+] as const;
+
+export const industryAreas = [
+  { name: "Logística", basePrice: 1000 },
+  { name: "Produção", basePrice: 1500 },
+  { name: "Inteligência de Negócios", basePrice: 2000 },
+  { name: "Envio de Relatórios", basePrice: 800 }
+] as const;
+
+export const automationObjectives = [
+  "Aumentar Vendas",
+  "Reduzir Custos",
+  "Melhorar Experiência",
+  "Otimizar Tempo",
+  "Inteligência Estratégica"
+] as const;
+
+export const aiFeatures = [
+  { name: "Análise de Texto", value: 1000 },
+  { name: "Reconhecimento de Imagens", value: 1500 },
+  { name: "Análise Preditiva", value: 2000 },
+  { name: "Recomendação Personalizada", value: 1800 },
+  { name: "Classificação Automática", value: 1200 },
+  { name: "Detecção de Anomalias", value: 2200 }
+] as const;
+
+export const aiTraining = [
+  { name: "Treinamento Básico", value: 1000 },
+  { name: "Treinamento Personalizado", value: 2500 },
+  { name: "Treinamento Avançado", value: 5000 }
+] as const;
+
+export const aiTools = [
+  { name: "Prompt Studio", value: 800 },
+  { name: "Monitoramento de IA", value: 1200 },
+  { name: "Ferramentas de Auditoria", value: 1500 },
+  { name: "Geração de Conteúdo", value: 1800 },
+  { name: "Painel de Controle IA", value: 2200 }
+] as const;
+
+export const aiLevelThresholds = {
+  simple: { min: 0, max: 5000 },
+  intermediate: { min: 5001, max: 10000 },
+  complex: { min: 10001, max: Infinity }
+} as const;
+
+export const availableModules = [
+  { 
+    name: "WhatsApp",
+    basePrice: 1500,
+    prices: { easy: 1500, normal: 2500, complex: 4000 }
+  },
+  { 
+    name: "Disparador de Mensagens / Captação",
+    basePrice: 1200,
+    prices: { easy: 1200, normal: 2000, complex: 3500 }
+  },
+  { 
+    name: "Banco de Dados",
+    basePrice: 2000,
+    prices: { easy: 2000, normal: 3000, complex: 4500 }
+  },
+  { 
+    name: "IA Avançada & Prompt Studio",
+    basePrice: 2500,
+    prices: { easy: 2500, normal: 4000, complex: 6000 }
+  },
+  { 
+    name: "Integração ERP",
+    basePrice: 2200,
+    prices: { easy: 2200, normal: 3500, complex: 5800 }
+  },
+  { 
+    name: "Integração CRM",
+    basePrice: 2000,
+    prices: { easy: 2000, normal: 3000, complex: 5200 }
+  },
+  { 
+    name: "RAG / Base de Conhecimento",
+    basePrice: 1800,
+    prices: { easy: 1800, normal: 2800, complex: 4500 }
+  },
+  { 
+    name: "Google Drive Connector",
+    basePrice: 1200,
+    prices: { easy: 1200, normal: 1800, complex: 2500 }
+  },
+  { 
+    name: "Análise de Dados + Dashboard",
+    basePrice: 2400,
+    prices: { easy: 2400, normal: 3600, complex: 5800 }
+  },
+  { 
+    name: "Lembretes & Automação Follow-up",
+    basePrice: 1000,
+    prices: { easy: 1000, normal: 1800, complex: 2500 }
+  },
+  { 
+    name: "Outro",
+    basePrice: 1500,
+    prices: { easy: 1500, normal: 3000, complex: 5000 }
+  }
+] as const;
 
 // Segments Data
 export const segmentsData: SegmentData[] = [
@@ -567,6 +700,7 @@ export const modulesData: ModuleData[] = [
       "Criação": false,
       "Mídia": false,
       "Planejamento": false,
+      "Atendimento": false,
       "Pedagógico": false,
       "Rotas": false,
       "Entregas": false,
@@ -809,187 +943,4 @@ export const modulesData: ModuleData[] = [
       "Planejamento": false,
       "Pedagógico": true,
       "Rotas": false,
-      "Entregas": true,
-      "Armazenagem": false,
-      "Distribuição": false
-    }
-  },
-  {
-    name: "Outro",
-    prices: { I: 1500, M: 3000, A: 5000 },
-    departmentAvailability: {
-      // Available for all departments
-      "Recepção": true,
-      "Agenda": true,
-      "Faturamento": true,
-      "Marketing": true,
-      "Internação": true,
-      "Emergência": true,
-      "Administrativo": true,
-      "Farmácia": true,
-      "Coleta": true,
-      "Análises": true,
-      "Resultados": true,
-      "Administração": true,
-      "Avaliação": true,
-      "Tratamento": true,
-      "Comercial": true,
-      "Orçamentos": true,
-      "RH": true,
-      "Financeiro": true,
-      "Operações": true,
-      "Projetos": true,
-      "Vendas": true,
-      "Legal": true,
-      "Locação": true,
-      "Catálogo": true,
-      "Logística": true,
-      "SAC": true,
-      "Produtos": true,
-      "Estoque": true,
-      "Delivery": true,
-      "Suporte": true,
-      "Produção": true,
-      "Qualidade": true,
-      "Compras": true,
-      "P&D": true,
-      "Controle": true,
-      "Moldagem": true,
-      "Acabamento": true,
-      "Expedição": true,
-      "Fiscal": true,
-      "Contábil": true,
-      "Pessoal": true,
-      "Consultoria": true,
-      "Criação": true,
-      "Mídia": true,
-      "Planejamento": true,
-      "Atendimento": true,
-      "Pedagógico": true,
-      "Rotas": true,
-      "Entregas": true,
-      "Armazenagem": true,
-      "Distribuição": true
-    }
-  }
-];
-
-// Helper functions
-export const getSubNichesBySegment = (segment: Segment): SubNicheData[] => {
-  const segmentData = segmentsData.find(s => s.name === segment);
-  return segmentData ? segmentData.subNiches : [];
-};
-
-export const getDepartmentsBySubNiche = (segment: Segment, subNiche: SubNiche): Department[] => {
-  const segmentData = segmentsData.find(s => s.name === segment);
-  if (!segmentData) return [];
-  
-  const subNicheData = segmentData.subNiches.find(sn => sn.name === subNiche);
-  return subNicheData ? subNicheData.departments : [];
-};
-
-export const getAvailableModules = (department: Department): ModuleName[] => {
-  return modulesData
-    .filter(module => module.departmentAvailability[department])
-    .map(module => module.name);
-};
-
-export const calculateTotalPrice = (state: CalculatorState) => {
-  let implementationTotal = 0;
-  let monthlyTotal = 0;
-
-  // Base price for segment
-  if (state.selectedSegment) {
-    const segment = segmentsData.find(s => s.name === state.selectedSegment);
-    implementationTotal += segment?.basePrice || 0;
-  }
-
-  // Base price for sub-niche
-  if (state.selectedSegment && state.selectedSubNiche) {
-    const segment = segmentsData.find(s => s.name === state.selectedSegment);
-    if (segment) {
-      const subNiche = segment.subNiches.find(sn => sn.name === state.selectedSubNiche);
-      implementationTotal += subNiche?.basePrice || 0;
-    }
-  }
-
-  // Calculate price for each selected module
-  state.selectedModules.forEach(module => {
-    if (module.level) {
-      const moduleData = modulesData.find(m => m.name === module.name);
-      if (moduleData) {
-        implementationTotal += moduleData.prices[module.level];
-      }
-    }
-  });
-
-  // Apply discount if any
-  if (state.discount > 0) {
-    implementationTotal = implementationTotal * (1 - state.discount / 100);
-  }
-
-  // Calculate monthly cost (20% of implementation)
-  monthlyTotal = implementationTotal * 0.2;
-
-  return {
-    implementation: implementationTotal,
-    monthly: monthlyTotal
-  };
-};
-
-export const generateImplementationTimeline = (state: CalculatorState) => {
-  const tasks = [
-    { phase: "Levantamento / Kickoff", days: 7, description: "Definição detalhada do escopo e planejamento do projeto." },
-    { phase: "Configurações Base + Integrações", days: 7, description: "Implementação das configurações básicas e integrações necessárias." },
-    { phase: "Testes / Treinamento", days: 7, description: "Realização de testes de qualidade e treinamento dos usuários." },
-    { phase: "Go-Live / Handover", days: 7, description: "Implementação final, ajustes e entrega do projeto." }
-  ];
-
-  return {
-    totalDays: 28,
-    tasks: tasks
-  };
-};
-
-export const generateCommercialProposal = (state: CalculatorState): string => {
-  const totalPrice = calculateTotalPrice(state);
-
-  return `
-Proposta Comercial
-
-Prezado(a) ${state.clientName},
-
-Agradecemos a oportunidade de apresentar nossa proposta para o desenvolvimento de uma solução de automação inteligente para a sua empresa, ${state.companyName}.
-
-Escopo do Projeto:
-- Cliente: ${state.clientName}
-- Empresa: ${state.companyName}
-- Telefone: ${state.clientPhone}
-- Descrição do Projeto: ${state.projectDescription}
-- Segmento: ${state.selectedSegment}
-- Subnicho: ${state.selectedSubNiche}
-- Departamento: ${state.selectedDepartment}
-
-Módulos Selecionados:
-${state.selectedModules.map(module => `  - ${module.name} (${module.level === 'I' ? 'Iniciante' : module.level === 'M' ? 'Intermediário' : 'Avançado'})\n`).join('')}
-
-Investimento:
-- Implementação: R$ ${totalPrice.implementation.toLocaleString('pt-BR')}
-- Mensalidade (Manutenção): R$ ${totalPrice.monthly.toLocaleString('pt-BR')}
-
-Cronograma de Implementação:
-${generateImplementationTimeline(state).tasks.map(task => `  - ${task.phase}: ${task.days} dias\n`).join('')}
-
-Condições Gerais:
-- Prazo de Entrega: 28 dias
-- Forma de Pagamento: [A combinar]
-
-Observações:
-${state.notes || "Nenhuma observação adicional."}
-
-Aguardamos ansiosamente a sua aprovação para darmos início a este projeto inovador.
-
-Atenciosamente,
-TARS AI
-`;
-};
+      "Entreg
