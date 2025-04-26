@@ -1,53 +1,5 @@
 
-export type BusinessNiche =
-  | "Saúde"
-  | "Varejo"
-  | "E-commerce"
-  | "Franquias"
-  | "Indústria"
-  | "Serviços";
-
-export type IndustryArea =
-  | "Logística"
-  | "Produção"
-  | "Inteligência de Negócios"
-  | "Envio de Relatórios";
-
-export type AutomationObjective =
-  | "Aumentar Vendas"
-  | "Reduzir Custos"
-  | "Melhorar Experiência"
-  | "Otimizar Tempo"
-  | "Inteligência Estratégica";
-
-export type AILevel =
-  | "IA Simples"
-  | "IA Intermediária"
-  | "IA Complexa";
-
-export type AIFeature =
-  | "Análise Preditiva"
-  | "Processamento de Linguagem Natural (NLP)"
-  | "Reconhecimento de Imagens"
-  | "Chatbots Inteligentes"
-  | "Recomendação Personalizada"
-  | "Automação de Tarefas Repetitivas";
-
-export type AITraining =
-  | "Nenhum"
-  | "Básico"
-  | "Avançado";
-
-export type AITool = 
-  | "Calendário"
-  | "Email"
-  | "Google Drive"
-  | "Recuperação de Documentos (RAG)"
-  | "Busca Semântica"
-  | "Análise de Dados"
-  | "Integração com APIs Externas"
-  | "Processamento de Imagens";
-
+// Basic Types
 export type ComplexityLevel = "easy" | "normal" | "complex";
 
 export const complexityLevels = {
@@ -56,189 +8,927 @@ export const complexityLevels = {
   complex: "Avançado"
 };
 
+// New Structure Types
+export type Segment = 
+  | "Saúde"
+  | "Construção Civil"
+  | "E-commerce"
+  | "Indústria"
+  | "Serviços";
+
+export type SubNiche = string;
+
+export type Department = string;
+
+export type ModuleLevel = "I" | "M" | "A";
+
 export type ModuleName =
-  | "Banco de Dados"
   | "WhatsApp"
-  | "ERP"
-  | "CRM"
-  | "Lembretes"
-  | "Análise de Dados"
-  | "Dashboard"
-  | "API de Integração";
+  | "Disparador de Mensagens / Captação"
+  | "Banco de Dados"
+  | "IA Avançada & Prompt Studio"
+  | "Integração ERP"
+  | "Integração CRM"
+  | "RAG / Base de Conhecimento"
+  | "Google Drive Connector"
+  | "Análise de Dados + Dashboard"
+  | "Lembretes & Automação Follow-up"
+  | "Outro";
 
 export interface Module {
   name: ModuleName;
   basePrice: number;
-  complexity: ComplexityLevel | null;
+  level: ModuleLevel | null;
+  available: boolean;
 }
 
+export interface SubNicheData {
+  name: SubNiche;
+  basePrice: number;
+  departments: Department[];
+}
+
+export interface SegmentData {
+  name: Segment;
+  basePrice: number;
+  subNiches: SubNicheData[];
+}
+
+export interface ModuleData {
+  name: ModuleName;
+  prices: {
+    I: number;
+    M: number;
+    A: number;
+  };
+  departmentAvailability: Record<Department, boolean>;
+}
+
+// State for the pricing calculator
 export interface CalculatorState {
+  currentStep: number;
   clientName: string;
   companyName: string;
   clientPhone: string;
-  initialIdea: string;
-  selectedNiche: BusinessNiche | null;
-  nicheUnits: number;
-  selectedIndustryArea: IndustryArea | null;
-  whatsappNumbers: number;
-  selectedObjectives: AutomationObjective[];
-  selectedAILevel: AILevel | null;
-  selectedAIFeatures: AIFeature[];
-  selectedAITraining: AITraining | null;
-  selectedAITools: AITool[];
+  projectDescription: string;
+  selectedSegment: Segment | null;
+  selectedSubNiche: SubNiche | null;
+  selectedDepartment: Department | null;
   selectedModules: Module[];
+  notes: string;
+  discount: number;
 }
 
-export const aiLevelThresholds = {
-  simple: { max: 2000 },
-  intermediate: { max: 4000 }
-};
-
-// Define aiTools array
-export const aiTools: { name: AITool; value: number }[] = [
-  { name: "Calendário", value: 500 },
-  { name: "Email", value: 400 },
-  { name: "Google Drive", value: 600 },
-  { name: "Recuperação de Documentos (RAG)", value: 800 },
-  { name: "Busca Semântica", value: 700 },
-  { name: "Análise de Dados", value: 900 },
-  { name: "Integração com APIs Externas", value: 1000 },
-  { name: "Processamento de Imagens", value: 800 }
-];
-
-export const availableModules: {
-  name: ModuleName;
-  basePrice: number;
-  prices: { [key in ComplexityLevel]: number };
-}[] = [
+// Segments Data
+export const segmentsData: SegmentData[] = [
   {
-    name: "Banco de Dados",
-    basePrice: 1500,
-    prices: { easy: 2000, normal: 3000, complex: 4500 }
-  },
-  {
-    name: "WhatsApp",
-    basePrice: 1200,
-    prices: { easy: 1800, normal: 2700, complex: 4000 }
-  },
-  {
-    name: "ERP",
+    name: "Saúde",
     basePrice: 2500,
-    prices: { easy: 3000, normal: 4500, complex: 6000 }
+    subNiches: [
+      {
+        name: "Clínica",
+        basePrice: 3000,
+        departments: ["Recepção", "Agenda", "Faturamento", "Marketing"]
+      },
+      {
+        name: "Hospital",
+        basePrice: 5000,
+        departments: ["Internação", "Emergência", "Administrativo", "Farmácia"]
+      },
+      {
+        name: "Laboratório de Análises",
+        basePrice: 3500,
+        departments: ["Coleta", "Análises", "Resultados", "Administração"]
+      },
+      {
+        name: "Fisioterapia",
+        basePrice: 2200,
+        departments: ["Agenda", "Avaliação", "Tratamento", "Financeiro"]
+      }
+    ]
   },
   {
-    name: "CRM",
-    basePrice: 2000,
-    prices: { easy: 2500, normal: 3800, complex: 5200 }
+    name: "Construção Civil",
+    basePrice: 3000,
+    subNiches: [
+      {
+        name: "Construtora",
+        basePrice: 3500,
+        departments: ["Comercial", "Orçamentos", "RH", "Financeiro", "Operações"]
+      },
+      {
+        name: "Incorporadora",
+        basePrice: 4000,
+        departments: ["Projetos", "Vendas", "Legal", "Financeiro"]
+      },
+      {
+        name: "Imobiliária",
+        basePrice: 2500,
+        departments: ["Vendas", "Locação", "Administração", "Marketing"]
+      }
+    ]
   },
   {
-    name: "Lembretes",
-    basePrice: 800,
-    prices: { easy: 1200, normal: 1800, complex: 2500 }
-  },
-  {
-    name: "Análise de Dados",
-    basePrice: 1800,
-    prices: { easy: 2400, normal: 3600, complex: 5000 }
-  },
-  {
-    name: "Dashboard",
-    basePrice: 1500,
-    prices: { easy: 2000, normal: 3000, complex: 4200 }
-  },
-  {
-    name: "API de Integração",
+    name: "E-commerce",
     basePrice: 2200,
-    prices: { easy: 2800, normal: 4200, complex: 5800 }
+    subNiches: [
+      {
+        name: "Moda",
+        basePrice: 2500,
+        departments: ["Catálogo", "Vendas", "Logística", "SAC"]
+      },
+      {
+        name: "Cosméticos",
+        basePrice: 2300,
+        departments: ["Produtos", "Marketing", "Logística", "Financeiro"]
+      },
+      {
+        name: "Alimentos",
+        basePrice: 2800,
+        departments: ["Estoque", "Delivery", "Marketing", "Financeiro"]
+      },
+      {
+        name: "Eletrônicos",
+        basePrice: 3000,
+        departments: ["Produtos", "Vendas", "Suporte", "Logística"]
+      }
+    ]
+  },
+  {
+    name: "Indústria",
+    basePrice: 4000,
+    subNiches: [
+      {
+        name: "Metalurgia",
+        basePrice: 4500,
+        departments: ["Produção", "Qualidade", "Vendas", "Compras"]
+      },
+      {
+        name: "Alimentos",
+        basePrice: 4200,
+        departments: ["Produção", "Qualidade", "Estoque", "Distribuição"]
+      },
+      {
+        name: "Química",
+        basePrice: 5000,
+        departments: ["P&D", "Produção", "Controle", "Logística"]
+      },
+      {
+        name: "Plásticos",
+        basePrice: 3800,
+        departments: ["Moldagem", "Acabamento", "Expedição", "Vendas"]
+      }
+    ]
+  },
+  {
+    name: "Serviços",
+    basePrice: 1800,
+    subNiches: [
+      {
+        name: "Contabilidade",
+        basePrice: 2000,
+        departments: ["Fiscal", "Contábil", "Pessoal", "Consultoria"]
+      },
+      {
+        name: "Marketing",
+        basePrice: 1900,
+        departments: ["Criação", "Mídia", "Planejamento", "Atendimento"]
+      },
+      {
+        name: "Educação",
+        basePrice: 2200,
+        departments: ["Pedagógico", "Administrativo", "Financeiro", "Comercial"]
+      },
+      {
+        name: "Logística",
+        basePrice: 2500,
+        departments: ["Rotas", "Entregas", "Armazenagem", "Faturamento"]
+      }
+    ]
   }
 ];
 
-// Define businessNiches array
-export const businessNiches: { name: BusinessNiche; basePrice: number }[] = [
-  { name: "Saúde", basePrice: 2500 },
-  { name: "Varejo", basePrice: 2000 },
-  { name: "E-commerce", basePrice: 2200 },
-  { name: "Franquias", basePrice: 3000 },
-  { name: "Indústria", basePrice: 4000 },
-  { name: "Serviços", basePrice: 1800 }
+// Modules Data
+export const modulesData: ModuleData[] = [
+  {
+    name: "WhatsApp",
+    prices: { I: 1500, M: 2500, A: 4000 },
+    departmentAvailability: {
+      // Saúde
+      "Recepção": true,
+      "Agenda": true,
+      "Faturamento": true,
+      "Marketing": true,
+      "Internação": true,
+      "Emergência": true,
+      "Administrativo": true,
+      "Farmácia": false,
+      "Coleta": true,
+      "Análises": false,
+      "Resultados": true,
+      "Administração": true,
+      "Avaliação": false,
+      "Tratamento": false,
+      
+      // Construção Civil
+      "Comercial": true,
+      "Orçamentos": true,
+      "RH": true,
+      "Financeiro": true,
+      "Operações": true,
+      "Projetos": true,
+      "Vendas": true,
+      "Legal": true,
+      "Locação": true,
+      
+      // E-commerce
+      "Catálogo": false,
+      "Logística": true,
+      "SAC": true,
+      "Produtos": false,
+      "Estoque": false,
+      "Delivery": true,
+      "Suporte": true,
+      
+      // Indústria
+      "Produção": false,
+      "Qualidade": false,
+      "Compras": true,
+      "P&D": false,
+      "Controle": false,
+      "Moldagem": false,
+      "Acabamento": false,
+      "Expedição": true,
+      
+      // Serviços
+      "Fiscal": true,
+      "Contábil": true,
+      "Pessoal": true,
+      "Consultoria": true,
+      "Criação": true,
+      "Mídia": true,
+      "Planejamento": true,
+      "Atendimento": true,
+      "Pedagógico": true,
+      "Rotas": true,
+      "Entregas": true,
+      "Armazenagem": false,
+      "Distribuição": true
+    }
+  },
+  {
+    name: "Disparador de Mensagens / Captação",
+    prices: { I: 1200, M: 2000, A: 3500 },
+    departmentAvailability: {
+      // Default availability by department - true for marketing departments
+      "Marketing": true,
+      "Comercial": true,
+      "Vendas": true,
+      "SAC": true,
+      "Atendimento": true,
+
+      // Set other departments to false
+      "Recepção": false,
+      "Agenda": false,
+      "Faturamento": false,
+      "Internação": false,
+      "Emergência": false,
+      "Administrativo": false,
+      "Farmácia": false,
+      "Coleta": false,
+      "Análises": false,
+      "Resultados": false,
+      "Administração": false,
+      "Avaliação": false,
+      "Tratamento": false,
+      "Orçamentos": false,
+      "RH": false,
+      "Financeiro": false,
+      "Operações": false,
+      "Projetos": false,
+      "Legal": false,
+      "Locação": false,
+      "Catálogo": false,
+      "Logística": false,
+      "Produtos": false,
+      "Estoque": false,
+      "Delivery": false,
+      "Suporte": false,
+      "Produção": false,
+      "Qualidade": false,
+      "Compras": false,
+      "P&D": false,
+      "Controle": false,
+      "Moldagem": false,
+      "Acabamento": false,
+      "Expedição": false,
+      "Fiscal": false,
+      "Contábil": false,
+      "Pessoal": false,
+      "Consultoria": false,
+      "Criação": false,
+      "Mídia": false,
+      "Planejamento": false,
+      "Pedagógico": false,
+      "Rotas": false,
+      "Entregas": false,
+      "Armazenagem": false,
+      "Distribuição": false
+    }
+  },
+  {
+    name: "Banco de Dados",
+    prices: { I: 2000, M: 3000, A: 4500 },
+    departmentAvailability: {
+      // Available for all departments
+      "Recepção": true,
+      "Agenda": true,
+      "Faturamento": true,
+      "Marketing": true,
+      "Internação": true,
+      "Emergência": true,
+      "Administrativo": true,
+      "Farmácia": true,
+      "Coleta": true,
+      "Análises": true,
+      "Resultados": true,
+      "Administração": true,
+      "Avaliação": true,
+      "Tratamento": true,
+      "Comercial": true,
+      "Orçamentos": true,
+      "RH": true,
+      "Financeiro": true,
+      "Operações": true,
+      "Projetos": true,
+      "Vendas": true,
+      "Legal": true,
+      "Locação": true,
+      "Catálogo": true,
+      "Logística": true,
+      "SAC": true,
+      "Produtos": true,
+      "Estoque": true,
+      "Delivery": true,
+      "Suporte": true,
+      "Produção": true,
+      "Qualidade": true,
+      "Compras": true,
+      "P&D": true,
+      "Controle": true,
+      "Moldagem": true,
+      "Acabamento": true,
+      "Expedição": true,
+      "Fiscal": true,
+      "Contábil": true,
+      "Pessoal": true,
+      "Consultoria": true,
+      "Criação": true,
+      "Mídia": true,
+      "Planejamento": true,
+      "Atendimento": true,
+      "Pedagógico": true,
+      "Rotas": true,
+      "Entregas": true,
+      "Armazenagem": true,
+      "Distribuição": true
+    }
+  },
+  {
+    name: "IA Avançada & Prompt Studio",
+    prices: { I: 2500, M: 4000, A: 6000 },
+    departmentAvailability: {
+      // Default values for a few key departments
+      "Marketing": true,
+      "Comercial": true,
+      "Atendimento": true,
+      "SAC": true,
+      "Consultoria": true,
+      "P&D": true,
+      "Planejamento": true,
+      
+      // Set other departments to false
+      "Recepção": false,
+      "Agenda": false,
+      "Faturamento": false,
+      "Internação": false,
+      "Emergência": false,
+      "Administrativo": false,
+      "Farmácia": false,
+      "Coleta": false,
+      "Análises": true,
+      "Resultados": true,
+      "Administração": false,
+      "Avaliação": false,
+      "Tratamento": false,
+      "Orçamentos": true,
+      "RH": false,
+      "Financeiro": false,
+      "Operações": false,
+      "Projetos": true,
+      "Vendas": false,
+      "Legal": false,
+      "Locação": false,
+      "Catálogo": false,
+      "Logística": false,
+      "Produtos": false,
+      "Estoque": false,
+      "Delivery": false,
+      "Suporte": false,
+      "Produção": false,
+      "Qualidade": false,
+      "Compras": false,
+      "Controle": false,
+      "Moldagem": false,
+      "Acabamento": false,
+      "Expedição": false,
+      "Fiscal": false,
+      "Contábil": false,
+      "Pessoal": false,
+      "Criação": true,
+      "Mídia": true,
+      "Pedagógico": true,
+      "Rotas": false,
+      "Entregas": false,
+      "Armazenagem": false,
+      "Distribuição": false
+    }
+  },
+  {
+    name: "Integração ERP",
+    prices: { I: 2200, M: 3500, A: 5800 },
+    departmentAvailability: {
+      // Financial, Administrative, and Operations departments
+      "Financeiro": true,
+      "Administrativo": true,
+      "Faturamento": true,
+      "Administração": true,
+      "Operações": true,
+      "Estoque": true,
+      "Compras": true,
+      "Fiscal": true,
+      "Contábil": true,
+      
+      // Set other departments to false
+      "Recepção": false,
+      "Agenda": false,
+      "Marketing": false,
+      "Internação": false,
+      "Emergência": false,
+      "Farmácia": false,
+      "Coleta": false,
+      "Análises": false,
+      "Resultados": false,
+      "Avaliação": false,
+      "Tratamento": false,
+      "Comercial": false,
+      "Orçamentos": true,
+      "RH": false,
+      "Projetos": false,
+      "Vendas": false,
+      "Legal": false,
+      "Locação": false,
+      "Catálogo": false,
+      "Logística": true,
+      "SAC": false,
+      "Produtos": true,
+      "Delivery": true,
+      "Suporte": false,
+      "Produção": true,
+      "Qualidade": false,
+      "P&D": false,
+      "Controle": true,
+      "Moldagem": false,
+      "Acabamento": false,
+      "Expedição": true,
+      "Pessoal": true,
+      "Consultoria": false,
+      "Criação": false,
+      "Mídia": false,
+      "Planejamento": false,
+      "Atendimento": false,
+      "Pedagógico": false,
+      "Rotas": true,
+      "Entregas": true,
+      "Armazenagem": true,
+      "Distribuição": true
+    }
+  },
+  {
+    name: "Integração CRM",
+    prices: { I: 2000, M: 3000, A: 5200 },
+    departmentAvailability: {
+      // Sales, Marketing, and Customer Service departments
+      "Comercial": true,
+      "Vendas": true,
+      "Marketing": true,
+      "SAC": true,
+      "Atendimento": true,
+      
+      // Set other departments to false
+      "Recepção": true,
+      "Agenda": false,
+      "Faturamento": false,
+      "Internação": false,
+      "Emergência": false,
+      "Administrativo": false,
+      "Farmácia": false,
+      "Coleta": false,
+      "Análises": false,
+      "Resultados": false,
+      "Administração": false,
+      "Avaliação": false,
+      "Tratamento": false,
+      "Orçamentos": false,
+      "RH": false,
+      "Financeiro": false,
+      "Operações": false,
+      "Projetos": false,
+      "Legal": false,
+      "Locação": false,
+      "Catálogo": false,
+      "Logística": false,
+      "Produtos": false,
+      "Estoque": false,
+      "Delivery": false,
+      "Suporte": true,
+      "Produção": false,
+      "Qualidade": false,
+      "Compras": false,
+      "P&D": false,
+      "Controle": false,
+      "Moldagem": false,
+      "Acabamento": false,
+      "Expedição": false,
+      "Fiscal": false,
+      "Contábil": false,
+      "Pessoal": false,
+      "Consultoria": true,
+      "Criação": false,
+      "Mídia": false,
+      "Planejamento": false,
+      "Pedagógico": false,
+      "Rotas": false,
+      "Entregas": false,
+      "Armazenagem": false,
+      "Distribuição": false
+    }
+  },
+  {
+    name: "RAG / Base de Conhecimento",
+    prices: { I: 1800, M: 2800, A: 4500 },
+    departmentAvailability: {
+      // Knowledge-heavy departments
+      "Consultoria": true,
+      "SAC": true,
+      "Suporte": true,
+      "P&D": true,
+      "Legal": true,
+      "Pedagógico": true,
+      
+      // Set other departments to false
+      "Recepção": false,
+      "Agenda": false,
+      "Faturamento": false,
+      "Marketing": false,
+      "Internação": false,
+      "Emergência": false,
+      "Administrativo": false,
+      "Farmácia": true,
+      "Coleta": false,
+      "Análises": true,
+      "Resultados": false,
+      "Administração": false,
+      "Avaliação": true,
+      "Tratamento": true,
+      "Comercial": false,
+      "Orçamentos": false,
+      "RH": true,
+      "Financeiro": false,
+      "Operações": false,
+      "Projetos": true,
+      "Vendas": false,
+      "Locação": false,
+      "Catálogo": false,
+      "Logística": false,
+      "Produtos": false,
+      "Estoque": false,
+      "Delivery": false,
+      "Produção": false,
+      "Qualidade": true,
+      "Compras": false,
+      "Controle": false,
+      "Moldagem": false,
+      "Acabamento": false,
+      "Expedição": false,
+      "Fiscal": true,
+      "Contábil": true,
+      "Pessoal": false,
+      "Criação": false,
+      "Mídia": false,
+      "Planejamento": true,
+      "Atendimento": true,
+      "Rotas": false,
+      "Entregas": false,
+      "Armazenagem": false,
+      "Distribuição": false
+    }
+  },
+  {
+    name: "Google Drive Connector",
+    prices: { I: 1200, M: 1800, A: 2500 },
+    departmentAvailability: {
+      // Document-heavy departments
+      "Administrativo": true,
+      "Administração": true,
+      "Legal": true,
+      "Projetos": true,
+      "RH": true,
+      "Fiscal": true,
+      "Contábil": true,
+      "Planejamento": true,
+      "Pedagógico": true,
+      
+      // Set other departments to false
+      "Recepção": false,
+      "Agenda": false,
+      "Faturamento": false,
+      "Marketing": true,
+      "Internação": false,
+      "Emergência": false,
+      "Farmácia": false,
+      "Coleta": false,
+      "Análises": false,
+      "Resultados": true,
+      "Avaliação": false,
+      "Tratamento": false,
+      "Comercial": true,
+      "Orçamentos": true,
+      "Financeiro": true,
+      "Operações": false,
+      "Vendas": false,
+      "Locação": false,
+      "Catálogo": false,
+      "Logística": false,
+      "SAC": false,
+      "Produtos": false,
+      "Estoque": false,
+      "Delivery": false,
+      "Suporte": true,
+      "Produção": false,
+      "Qualidade": true,
+      "Compras": true,
+      "P&D": true,
+      "Controle": false,
+      "Moldagem": false,
+      "Acabamento": false,
+      "Expedição": false,
+      "Pessoal": true,
+      "Consultoria": true,
+      "Criação": true,
+      "Mídia": true,
+      "Atendimento": false,
+      "Rotas": false,
+      "Entregas": false,
+      "Armazenagem": false,
+      "Distribuição": false
+    }
+  },
+  {
+    name: "Análise de Dados + Dashboard",
+    prices: { I: 2400, M: 3600, A: 5800 },
+    departmentAvailability: {
+      // Data-intensive departments
+      "Financeiro": true,
+      "Marketing": true,
+      "P&D": true,
+      "Qualidade": true,
+      "Operações": true,
+      "Vendas": true,
+      "Planejamento": true,
+      
+      // Set other departments to false
+      "Recepção": false,
+      "Agenda": false,
+      "Faturamento": true,
+      "Internação": false,
+      "Emergência": false,
+      "Administrativo": true,
+      "Farmácia": false,
+      "Coleta": false,
+      "Análises": true,
+      "Resultados": true,
+      "Administração": true,
+      "Avaliação": false,
+      "Tratamento": false,
+      "Comercial": true,
+      "Orçamentos": true,
+      "RH": true,
+      "Projetos": true,
+      "Legal": false,
+      "Locação": false,
+      "Catálogo": false,
+      "Logística": true,
+      "SAC": false,
+      "Produtos": true,
+      "Estoque": true,
+      "Delivery": false,
+      "Suporte": false,
+      "Produção": true,
+      "Compras": true,
+      "Controle": true,
+      "Moldagem": false,
+      "Acabamento": false,
+      "Expedição": true,
+      "Fiscal": true,
+      "Contábil": true,
+      "Pessoal": false,
+      "Consultoria": true,
+      "Criação": false,
+      "Mídia": true,
+      "Atendimento": false,
+      "Pedagógico": true,
+      "Rotas": true,
+      "Entregas": true,
+      "Armazenagem": true,
+      "Distribuição": true
+    }
+  },
+  {
+    name: "Lembretes & Automação Follow-up",
+    prices: { I: 1000, M: 1800, A: 2500 },
+    departmentAvailability: {
+      // Follow-up intensive departments
+      "Comercial": true,
+      "Vendas": true,
+      "Marketing": true,
+      "SAC": true,
+      "Atendimento": true,
+      "Recepção": true,
+      "Agenda": true,
+      
+      // Set other departments to false
+      "Faturamento": false,
+      "Internação": false,
+      "Emergência": false,
+      "Administrativo": false,
+      "Farmácia": false,
+      "Coleta": true,
+      "Análises": false,
+      "Resultados": true,
+      "Administração": false,
+      "Avaliação": true,
+      "Tratamento": true,
+      "Orçamentos": true,
+      "RH": true,
+      "Financeiro": false,
+      "Operações": false,
+      "Projetos": true,
+      "Legal": true,
+      "Locação": true,
+      "Catálogo": false,
+      "Logística": false,
+      "Produtos": false,
+      "Estoque": false,
+      "Delivery": true,
+      "Suporte": true,
+      "Produção": false,
+      "Qualidade": false,
+      "Compras": false,
+      "P&D": false,
+      "Controle": false,
+      "Moldagem": false,
+      "Acabamento": false,
+      "Expedição": false,
+      "Fiscal": false,
+      "Contábil": false,
+      "Pessoal": true,
+      "Consultoria": true,
+      "Criação": false,
+      "Mídia": false,
+      "Planejamento": false,
+      "Pedagógico": true,
+      "Rotas": false,
+      "Entregas": true,
+      "Armazenagem": false,
+      "Distribuição": false
+    }
+  },
+  {
+    name: "Outro",
+    prices: { I: 1500, M: 3000, A: 5000 },
+    departmentAvailability: {
+      // Available for all departments
+      "Recepção": true,
+      "Agenda": true,
+      "Faturamento": true,
+      "Marketing": true,
+      "Internação": true,
+      "Emergência": true,
+      "Administrativo": true,
+      "Farmácia": true,
+      "Coleta": true,
+      "Análises": true,
+      "Resultados": true,
+      "Administração": true,
+      "Avaliação": true,
+      "Tratamento": true,
+      "Comercial": true,
+      "Orçamentos": true,
+      "RH": true,
+      "Financeiro": true,
+      "Operações": true,
+      "Projetos": true,
+      "Vendas": true,
+      "Legal": true,
+      "Locação": true,
+      "Catálogo": true,
+      "Logística": true,
+      "SAC": true,
+      "Produtos": true,
+      "Estoque": true,
+      "Delivery": true,
+      "Suporte": true,
+      "Produção": true,
+      "Qualidade": true,
+      "Compras": true,
+      "P&D": true,
+      "Controle": true,
+      "Moldagem": true,
+      "Acabamento": true,
+      "Expedição": true,
+      "Fiscal": true,
+      "Contábil": true,
+      "Pessoal": true,
+      "Consultoria": true,
+      "Criação": true,
+      "Mídia": true,
+      "Planejamento": true,
+      "Atendimento": true,
+      "Pedagógico": true,
+      "Rotas": true,
+      "Entregas": true,
+      "Armazenagem": true,
+      "Distribuição": true
+    }
+  }
 ];
 
-// Define industryAreas array
-export const industryAreas: { name: IndustryArea; basePrice: number }[] = [
-  { name: "Logística", basePrice: 1200 },
-  { name: "Produção", basePrice: 1500 },
-  { name: "Inteligência de Negócios", basePrice: 2000 },
-  { name: "Envio de Relatórios", basePrice: 1000 }
-];
+// Helper functions
+export const getSubNichesBySegment = (segment: Segment): SubNicheData[] => {
+  const segmentData = segmentsData.find(s => s.name === segment);
+  return segmentData ? segmentData.subNiches : [];
+};
 
-// Define automationObjectives array
-export const automationObjectives: AutomationObjective[] = [
-  "Aumentar Vendas",
-  "Reduzir Custos",
-  "Melhorar Experiência",
-  "Otimizar Tempo",
-  "Inteligência Estratégica"
-];
+export const getDepartmentsBySubNiche = (segment: Segment, subNiche: SubNiche): Department[] => {
+  const segmentData = segmentsData.find(s => s.name === segment);
+  if (!segmentData) return [];
+  
+  const subNicheData = segmentData.subNiches.find(sn => sn.name === subNiche);
+  return subNicheData ? subNicheData.departments : [];
+};
 
-// Define aiFeatures array
-export const aiFeatures: { name: AIFeature; value: number }[] = [
-  { name: "Análise Preditiva", value: 1200 },
-  { name: "Processamento de Linguagem Natural (NLP)", value: 1500 },
-  { name: "Reconhecimento de Imagens", value: 1800 },
-  { name: "Chatbots Inteligentes", value: 1000 },
-  { name: "Recomendação Personalizada", value: 1300 },
-  { name: "Automação de Tarefas Repetitivas", value: 900 }
-];
-
-// Define aiTraining array
-export const aiTraining: { name: AITraining; value: number }[] = [
-  { name: "Nenhum", value: 0 },
-  { name: "Básico", value: 800 },
-  { name: "Avançado", value: 2000 }
-];
+export const getAvailableModules = (department: Department): ModuleName[] => {
+  return modulesData
+    .filter(module => module.departmentAvailability[department])
+    .map(module => module.name);
+};
 
 export const calculateTotalPrice = (state: CalculatorState) => {
   let implementationTotal = 0;
   let monthlyTotal = 0;
 
-  // Calcula o preço do nicho
-  if (state.selectedNiche) {
-    const niche = businessNiches.find((n) => n.name === state.selectedNiche);
-    implementationTotal += (niche?.basePrice || 0) * state.nicheUnits;
+  // Base price for segment
+  if (state.selectedSegment) {
+    const segment = segmentsData.find(s => s.name === state.selectedSegment);
+    implementationTotal += segment?.basePrice || 0;
   }
 
-  // Calcula o preço da área da indústria
-  if (state.selectedIndustryArea) {
-    const industryArea = industryAreas.find((area) => area.name === state.selectedIndustryArea);
-    implementationTotal += industryArea?.basePrice || 0;
+  // Base price for sub-niche
+  if (state.selectedSegment && state.selectedSubNiche) {
+    const segment = segmentsData.find(s => s.name === state.selectedSegment);
+    if (segment) {
+      const subNiche = segment.subNiches.find(sn => sn.name === state.selectedSubNiche);
+      implementationTotal += subNiche?.basePrice || 0;
+    }
   }
 
-  // Calcula o preço dos recursos de IA
-  state.selectedAIFeatures.forEach((feature) => {
-    const aiFeature = aiFeatures.find((ai) => ai.name === feature);
-    implementationTotal += aiFeature?.value || 0;
-  });
-
-  // Calcula o preço do treinamento de IA
-  if (state.selectedAITraining) {
-    const training = aiTraining.find((training) => training.name === state.selectedAITraining);
-    implementationTotal += training?.value || 0;
-  }
-
-  // Calcula o preço das ferramentas de IA
-  state.selectedAITools.forEach((tool) => {
-    const aiTool = aiTools.find((t) => t.name === tool);
-    implementationTotal += aiTool?.value || 0;
-  });
-
-  // Calcula o preço dos módulos
-  state.selectedModules.forEach((module) => {
-    const selectedModule = availableModules.find((m) => m.name === module.name);
-    if (selectedModule && module.complexity) {
-      implementationTotal += selectedModule.prices[module.complexity];
+  // Calculate price for each selected module
+  state.selectedModules.forEach(module => {
+    if (module.level) {
+      const moduleData = modulesData.find(m => m.name === module.name);
+      if (moduleData) {
+        implementationTotal += moduleData.prices[module.level];
+      }
     }
   });
 
+  // Apply discount if any
+  if (state.discount > 0) {
+    implementationTotal = implementationTotal * (1 - state.discount / 100);
+  }
+
+  // Calculate monthly cost (20% of implementation)
   monthlyTotal = implementationTotal * 0.2;
 
   return {
@@ -249,18 +939,14 @@ export const calculateTotalPrice = (state: CalculatorState) => {
 
 export const generateImplementationTimeline = (state: CalculatorState) => {
   const tasks = [
-    { phase: "Planejamento", days: 5, description: "Definição detalhada do escopo e planejamento do projeto." },
-    { phase: "Design", days: 7, description: "Criação do design da interface e experiência do usuário." },
-    { phase: "Desenvolvimento", days: 15, description: "Implementação das funcionalidades e integração dos módulos." },
-    { phase: "Testes", days: 3, description: "Testes de qualidade e correção de bugs." },
-    { phase: "Implantação", days: 2, description: "Implantação do sistema e treinamento dos usuários." }
+    { phase: "Levantamento / Kickoff", days: 7, description: "Definição detalhada do escopo e planejamento do projeto." },
+    { phase: "Configurações Base + Integrações", days: 7, description: "Implementação das configurações básicas e integrações necessárias." },
+    { phase: "Testes / Treinamento", days: 7, description: "Realização de testes de qualidade e treinamento dos usuários." },
+    { phase: "Go-Live / Handover", days: 7, description: "Implementação final, ajustes e entrega do projeto." }
   ];
 
-  let totalDays = 0;
-  tasks.forEach(task => totalDays += task.days);
-
   return {
-    totalDays: totalDays,
+    totalDays: 28,
     tasks: tasks
   };
 };
@@ -279,16 +965,13 @@ Escopo do Projeto:
 - Cliente: ${state.clientName}
 - Empresa: ${state.companyName}
 - Telefone: ${state.clientPhone}
-- Ideia Inicial: ${state.initialIdea}
-- Nicho: ${state.selectedNiche} ${state.nicheUnits > 1 ? `(${state.nicheUnits} unidades)` : ""}
-${state.selectedIndustryArea ? `- Área da Indústria: ${state.selectedIndustryArea}` : ""}
-- Objetivos:
-${state.selectedObjectives.map(objective => `  - ${objective}\n`).join('')}
-- Recursos de IA:
-${state.selectedAIFeatures.map(feature => `  - ${feature}\n`).join('')}
-${state.selectedAITraining ? `- Treinamento de IA: ${state.selectedAITraining}\n` : ""}
-- Módulos Selecionados:
-${state.selectedModules.map(module => `  - ${module.name} (${module.complexity})\n`).join('')}
+- Descrição do Projeto: ${state.projectDescription}
+- Segmento: ${state.selectedSegment}
+- Subnicho: ${state.selectedSubNiche}
+- Departamento: ${state.selectedDepartment}
+
+Módulos Selecionados:
+${state.selectedModules.map(module => `  - ${module.name} (${module.level === 'I' ? 'Iniciante' : module.level === 'M' ? 'Intermediário' : 'Avançado'})\n`).join('')}
 
 Investimento:
 - Implementação: R$ ${totalPrice.implementation.toLocaleString('pt-BR')}
@@ -298,8 +981,11 @@ Cronograma de Implementação:
 ${generateImplementationTimeline(state).tasks.map(task => `  - ${task.phase}: ${task.days} dias\n`).join('')}
 
 Condições Gerais:
-- Prazo de Entrega: [A definir]
+- Prazo de Entrega: 28 dias
 - Forma de Pagamento: [A combinar]
+
+Observações:
+${state.notes || "Nenhuma observação adicional."}
 
 Aguardamos ansiosamente a sua aprovação para darmos início a este projeto inovador.
 

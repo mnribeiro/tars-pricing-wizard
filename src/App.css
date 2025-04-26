@@ -1,3 +1,4 @@
+
 #root {
   width: 100%;
   min-height: 100vh;
@@ -32,71 +33,86 @@ textarea:focus {
   border-color: #D4AF37;
 }
 
-/* Cards selecionáveis */
-.tars-card {
-  position: relative;
-  border-radius: 0.5rem;
-  border: 1px solid transparent;
-  transition: all 0.2s ease-in-out;
-  background: rgba(255, 255, 255, 0.05);
-  overflow: hidden;
-}
-
-.tars-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  border-color: rgba(212, 175, 55, 0.3);
-}
-
-.tars-card.selected {
-  border-color: #D4AF37;
-  background-color: rgba(212, 175, 55, 0.1);
-}
-
-.tars-card.selected:after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 0 20px 20px 0;
-  border-color: transparent #D4AF37 transparent transparent;
-}
-
-/* Botões de complexidade */
-.complexity-btn {
-  min-width: 85px;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-.complexity-btn:hover {
-  background-color: rgba(212, 175, 55, 0.05);
-}
-
-.complexity-btn.selected {
-  border-color: #D4AF37;
-  color: #D4AF37;
-  background-color: rgba(212, 175, 55, 0.1);
+/* Background da aplicação */
+.tars-background {
+  background-color: #0D1A24;
+  background-image: radial-gradient(circle at 10% 20%, rgba(20, 30, 48, 0.8) 0%, rgba(13, 26, 36, 0.9) 90%);
 }
 
 /* Logo TARS */
 .tars-logo {
-  max-width: 120px;
   height: auto;
 }
 
-.tars-logo-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Background da aplicação */
-.tars-background {
-  background-color: #0a1929;
-  background-image: radial-gradient(circle at 10% 20%, rgba(20, 30, 48, 0.8) 0%, rgba(10, 25, 41, 0.8) 90%);
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out forwards;
+}
+
+/* Step completion indicator */
+.step-completed {
+  color: #D4AF37;
+  border-color: #D4AF37;
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 6px;
+  background-color: #1a2836;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #D4AF37;
+  transition: width 0.3s ease;
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: #D4AF37;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #B39020;
+}
+
+.btn-outline {
+  border: 1px solid #D4AF37;
+  color: #D4AF37;
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background-color: rgba(212, 175, 55, 0.1);
 }
