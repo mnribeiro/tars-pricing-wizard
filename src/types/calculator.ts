@@ -1,3 +1,4 @@
+
 export type BusinessNiche =
   | "Saúde"
   | "Varejo"
@@ -37,7 +38,6 @@ export type AITraining =
   | "Básico"
   | "Avançado";
 
-// Update AITool type
 export type AITool = 
   | "Calendário"
   | "Email"
@@ -49,6 +49,12 @@ export type AITool =
   | "Processamento de Imagens";
 
 export type ComplexityLevel = "easy" | "normal" | "complex";
+
+export const complexityLevels = {
+  easy: "Fácil",
+  normal: "Intermediário",
+  complex: "Avançado"
+};
 
 export type ModuleName =
   | "Banco de Dados"
@@ -88,7 +94,7 @@ export const aiLevelThresholds = {
   intermediate: { max: 4000 }
 };
 
-// Update aiTools array
+// Define aiTools array
 export const aiTools: { name: AITool; value: number }[] = [
   { name: "Calendário", value: 500 },
   { name: "Email", value: 400 },
@@ -147,6 +153,50 @@ export const availableModules: {
   }
 ];
 
+// Define businessNiches array
+export const businessNiches: { name: BusinessNiche; basePrice: number }[] = [
+  { name: "Saúde", basePrice: 2500 },
+  { name: "Varejo", basePrice: 2000 },
+  { name: "E-commerce", basePrice: 2200 },
+  { name: "Franquias", basePrice: 3000 },
+  { name: "Indústria", basePrice: 4000 },
+  { name: "Serviços", basePrice: 1800 }
+];
+
+// Define industryAreas array
+export const industryAreas: { name: IndustryArea; basePrice: number }[] = [
+  { name: "Logística", basePrice: 1200 },
+  { name: "Produção", basePrice: 1500 },
+  { name: "Inteligência de Negócios", basePrice: 2000 },
+  { name: "Envio de Relatórios", basePrice: 1000 }
+];
+
+// Define automationObjectives array
+export const automationObjectives: AutomationObjective[] = [
+  "Aumentar Vendas",
+  "Reduzir Custos",
+  "Melhorar Experiência",
+  "Otimizar Tempo",
+  "Inteligência Estratégica"
+];
+
+// Define aiFeatures array
+export const aiFeatures: { name: AIFeature; value: number }[] = [
+  { name: "Análise Preditiva", value: 1200 },
+  { name: "Processamento de Linguagem Natural (NLP)", value: 1500 },
+  { name: "Reconhecimento de Imagens", value: 1800 },
+  { name: "Chatbots Inteligentes", value: 1000 },
+  { name: "Recomendação Personalizada", value: 1300 },
+  { name: "Automação de Tarefas Repetitivas", value: 900 }
+];
+
+// Define aiTraining array
+export const aiTraining: { name: AITraining; value: number }[] = [
+  { name: "Nenhum", value: 0 },
+  { name: "Básico", value: 800 },
+  { name: "Avançado", value: 2000 }
+];
+
 export const calculateTotalPrice = (state: CalculatorState) => {
   let implementationTotal = 0;
   let monthlyTotal = 0;
@@ -171,8 +221,8 @@ export const calculateTotalPrice = (state: CalculatorState) => {
 
   // Calcula o preço do treinamento de IA
   if (state.selectedAITraining) {
-    const aiTraining = aiTraining.find((training) => training.name === state.selectedAITraining);
-    implementationTotal += aiTraining?.value || 0;
+    const training = aiTraining.find((training) => training.name === state.selectedAITraining);
+    implementationTotal += training?.value || 0;
   }
 
   // Calcula o preço das ferramentas de IA
@@ -257,13 +307,3 @@ Atenciosamente,
 TARS AI
 `;
 };
-
-// Update businessNiches to remove explicit pricing display
-export const businessNiches: { name: BusinessNiche; basePrice: number }[] = [
-  { name: "Saúde", basePrice: 2500 },
-  { name: "Varejo", basePrice: 2000 },
-  { name: "E-commerce", basePrice: 2200 },
-  { name: "Franquias", basePrice: 3000 },
-  { name: "Indústria", basePrice: 4000 },
-  { name: "Serviços", basePrice: 1800 }
-];
