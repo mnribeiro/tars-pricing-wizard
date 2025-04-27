@@ -1,6 +1,6 @@
 
 import { cn } from "@/lib/utils";
-import { Segment, segmentsData } from "@/types/calculator";
+import { Segment, segmentData } from "@/types/calculator";
 import {
   Building,
   HeartPulse,
@@ -47,7 +47,7 @@ const SegmentSelector = ({
     <div className={cn("w-full", className)}>
       <h2 className="text-xl font-semibold mb-4">Selecione o Segmento</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {segmentsData.map((segment) => (
+        {segmentData.map((segment) => (
           <div
             key={segment.name}
             className={cn(

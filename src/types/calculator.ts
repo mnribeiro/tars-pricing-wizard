@@ -308,7 +308,7 @@ export const generateCommercialProposal = (state: CalculatorState): string => {
 
 export const getSubNichesBySegment = (segment: Segment): { name: SubNiche; basePrice: number; departments: Department[] }[] => {
   const foundSegment = segmentData.find(s => s.name === segment);
-  return foundSegment ? [] : [];
+  return foundSegment ? foundSegment.subNiches : [];
 };
 
 export const getDepartmentsBySubNiche = (segment: Segment, subNiche: SubNiche): Department[] => {
