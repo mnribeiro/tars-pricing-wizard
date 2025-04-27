@@ -22,7 +22,9 @@ import {
   calculateTotalPrice,
   generateImplementationTimeline,
   generateCommercialProposal,
-  Segment
+  Segment,
+  SubNiche,
+  Department
 } from "@/types/calculator";
 import SelectableCard from "./SelectableCard";
 import ComplexitySelector from "./ComplexitySelector";
@@ -113,6 +115,40 @@ const PricingCalculator = () => {
       whatsappNumbers: increment 
         ? Math.min(prev.whatsappNumbers + 1, 10) // Limitar a 10 números
         : Math.max(prev.whatsappNumbers - 1, 1)  // Mínimo de 1 número
+    }));
+  };
+
+  const handleSegmentChange = (segment: Segment) => {
+    setState(prevState => ({
+      ...prevState,
+      selectedSegment: segment,
+      selectedSubNiche: null,
+      selectedDepartment: null,
+      selectedModules: []
+    }));
+  };
+
+  const handleSubNicheChange = (subNiche: SubNiche) => {
+    setState(prevState => ({
+      ...prevState,
+      selectedSubNiche: subNiche,
+      selectedDepartment: null,
+      selectedModules: []
+    }));
+  };
+
+  const handleDepartmentChange = (department: Department) => {
+    setState(prevState => ({
+      ...prevState,
+      selectedDepartment: department,
+      selectedModules: []
+    }));
+  };
+
+  const handleIndustryAreaChange = (area: string) => {
+    setState(prevState => ({
+      ...prevState,
+      selectedIndustryArea: area as IndustryArea
     }));
   };
 
@@ -453,6 +489,24 @@ const PricingCalculator = () => {
     }
   };
 
+  const handleObjectiveChange = (objective: string) => {
+    setState(prev => {
+      const objectives = [...prev.selectedObjectives];
+      const index = objectives.indexOf(objective as AutomationObjective);
+      
+      if (index > -1) {
+        objectives.splice(index, 1);
+      } else {
+        objectives.push(objective as AutomationObjective);
+      }
+      
+      return {
+        ...prev,
+        selectedObjectives: objectives
+      };
+    });
+  };
+
   return (
     <div className="container mx-auto max-w-4xl py-8 px-4 tars-background">
       <div className="tars-logo-container">
@@ -623,7 +677,7 @@ const PricingCalculator = () => {
               key={objective}
               title={objective}
               selected={isObjectiveSelected(objective)}
-              onClick={() => toggleObjective(objective)}
+              onClick={() => handleObjectiveChange(objective)}
               icon={renderIcon("objective", objective)}
             />
           ))}

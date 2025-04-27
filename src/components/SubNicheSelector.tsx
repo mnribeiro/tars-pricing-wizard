@@ -1,6 +1,6 @@
 
 import { cn } from "@/lib/utils";
-import { Segment, SubNiche, SubNicheData, getSubNichesBySegment } from "@/types/calculator";
+import { Segment, SubNiche, segmentData } from "@/types/calculator";
 import { useState } from "react";
 
 interface SubNicheSelectorProps {
@@ -19,7 +19,8 @@ const SubNicheSelector = ({
   const [hoveredSubNiche, setHoveredSubNiche] = useState<SubNiche | null>(null);
   
   // Get available sub-niches for the selected segment
-  const subNiches: SubNicheData[] = getSubNichesBySegment(selectedSegment);
+  const foundSegment = segmentData.find(s => s.name === selectedSegment);
+  const subNiches = foundSegment?.subNiches || [];
   
   return (
     <div className={cn("w-full", className)}>

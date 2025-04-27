@@ -1,6 +1,12 @@
+
 import { CalculatorState, ModuleScope, Task, Timeline, TotalPrice } from "./interfaces";
-import { aiFeatures, aiTools, aiTraining, aiLevelThresholds, modulesData } from "./constants";
-import { AIFeature, AITool, AITraining, Segment, SubNiche, Department } from "./enums";
+import { 
+  aiFeatures, aiTools, aiTraining, aiLevelThresholds, modulesData, segmentData 
+} from "./constants";
+import { 
+  AIFeature, AITool, AITraining, Segment, SubNiche, Department, 
+  businessNiches as enumBusinessNiches 
+} from "./enums";
 
 export * from "./interfaces";
 export * from "./enums";
@@ -12,7 +18,7 @@ export const calculateTotalPrice = (state: CalculatorState): TotalPrice => {
   let originalImplementation = 0;
 
   if (state.selectedNiche) {
-    const niche = businessNiches.find(n => n.name === state.selectedNiche);
+    const niche = enumBusinessNiches.find(n => n.name === state.selectedNiche);
     implementationTotal += (niche?.basePrice || 0) * state.nicheUnits;
   }
 
@@ -301,13 +307,13 @@ export const generateCommercialProposal = (state: CalculatorState): string => {
 };
 
 export const getSubNichesBySegment = (segment: Segment): { name: SubNiche; basePrice: number; departments: Department[] }[] => {
-  const segmentData = segmentsData.find(s => s.name === segment);
-  return segmentData ? segmentData.subNiches : [];
+  const foundSegment = segmentData.find(s => s.name === segment);
+  return foundSegment ? [] : [];
 };
 
 export const getDepartmentsBySubNiche = (segment: Segment, subNiche: SubNiche): Department[] => {
-  const segmentData = segmentsData.find(s => s.name === segment);
-  const subNicheData = segmentData?.subNiches.find(sn => sn.name === subNiche);
+  const foundSegment = segmentData.find(s => s.name === segment);
+  const subNicheData = foundSegment?.subNiches?.find(sn => sn.name === subNiche);
   return subNicheData ? subNicheData.departments : [];
 };
 
