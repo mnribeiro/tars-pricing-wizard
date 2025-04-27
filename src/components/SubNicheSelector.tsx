@@ -1,6 +1,6 @@
 
 import { cn } from "@/lib/utils";
-import { Segment, SubNiche, segmentData } from "@/types/calculator";
+import { Segment, SubNiche, getSubNichesBySegment } from "@/types/calculator";
 import { useState } from "react";
 
 interface SubNicheSelectorProps {
@@ -19,8 +19,7 @@ const SubNicheSelector = ({
   const [hoveredSubNiche, setHoveredSubNiche] = useState<SubNiche | null>(null);
   
   // Get available sub-niches for the selected segment
-  const foundSegment = segmentData.find(s => s.name === selectedSegment);
-  const subNiches = foundSegment?.subNiches || [];
+  const subNiches = getSubNichesBySegment(selectedSegment);
   
   return (
     <div className={cn("w-full", className)}>
@@ -32,7 +31,7 @@ const SubNicheSelector = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {subNiches.map((subNiche) => (
           <div
-            key={subNiche.name}
+            key={subNiche.id}
             className={cn(
               "border rounded-lg p-5 cursor-pointer transition-all duration-300",
               "hover:shadow-lg hover:border-[#D4AF37]",

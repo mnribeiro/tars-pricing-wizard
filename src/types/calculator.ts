@@ -1,325 +1,246 @@
 
-import { CalculatorState, ModuleScope, Task, Timeline, TotalPrice } from "./interfaces";
-import { 
-  aiFeatures, aiTools, aiTraining, aiLevelThresholds, modulesData, segmentData 
-} from "./constants";
-import { 
-  AIFeature, AITool, AITraining, Segment, SubNiche, Department, 
-  businessNiches as enumBusinessNiches 
-} from "./enums";
+import { AIFeature, AILevel, AITool, AITraining, AutomationObjective, ComplexityLevel, Department, IndustryArea, ModuleLevel, ModuleName, Segment, SubNiche } from "./enums";
+import { segmentsData } from "./constants";
 
-export * from "./interfaces";
-export * from "./enums";
-export * from "./constants";
+export type { AIFeature, AILevel, AITool, AITraining, AutomationObjective, ComplexityLevel, Department, IndustryArea, ModuleLevel, ModuleName, Segment, SubNiche };
 
+export interface Module {
+  name: ModuleName;
+  basePrice: number;
+  available: boolean;
+  level?: ModuleLevel;
+  complexity?: ComplexityLevel | null;
+}
+
+export interface CalculatorState {
+  currentStep: number;
+  clientName: string;
+  companyName: string;
+  clientPhone: string;
+  projectDescription: string;
+  initialIdea: string;
+  selectedSegment: Segment | null;
+  selectedSubNiche: SubNiche | null;
+  selectedDepartment: Department | null;
+  selectedModules: Module[];
+  selectedNiche: string | null;
+  nicheUnits: number;
+  selectedIndustryArea: IndustryArea | null;
+  whatsappNumbers: number;
+  selectedObjectives: AutomationObjective[];
+  selectedAILevel: AILevel | null;
+  selectedAIFeatures: AIFeature[];
+  selectedAITraining: AITraining | null;
+  selectedAITools: AITool[];
+  notes: string;
+  discount: number;
+}
+
+export interface ModuleScope {
+  module: string;
+  level: string;
+  description: string;
+}
+
+export interface ImplementationTask {
+  phase: string;
+  days: number;
+  description: string;
+}
+
+export interface ImplementationTimeline {
+  tasks: ImplementationTask[];
+  totalDays: number;
+}
+
+export interface TotalPrice {
+  implementation: number;
+  monthly: number;
+}
+
+// Gets the subniches for a specific segment
+export const getSubNichesBySegment = (segment: Segment): { id: string; name: SubNiche }[] => {
+  const foundSegment = segmentsData.find(s => s.name === segment);
+  return foundSegment?.subNiches || [];
+};
+
+// Gets departments available for a segment and subniche
+export const getDepartmentsBySubNiche = (segment: Segment, subNiche: SubNiche): Department[] => {
+  // This is a simplified implementation
+  return ["Vendas", "Financeiro", "RH", "Marketing", "Operações", "TI"];
+};
+
+// Calculate total price based on selected options
 export const calculateTotalPrice = (state: CalculatorState): TotalPrice => {
-  let implementationTotal = 0;
-  let monthlyTotal = 0;
-  let originalImplementation = 0;
+  // This is a sample implementation
+  let implementationPrice = 0;
+  let monthlyPrice = 0;
 
-  if (state.selectedNiche) {
-    const niche = enumBusinessNiches.find(n => n.name === state.selectedNiche);
-    implementationTotal += (niche?.basePrice || 0) * state.nicheUnits;
-  }
-
+  // Add base price from modules
   state.selectedModules.forEach(module => {
-    const moduleData = modulesData.find(m => m.name === module.name);
-
-    if (moduleData && module.complexity) {
-      implementationTotal += moduleData.prices[module.complexity];
+    if (module.complexity === 'easy') {
+      implementationPrice += module.basePrice;
+      monthlyPrice += module.basePrice * 0.1;
+    } else if (module.complexity === 'normal') {
+      implementationPrice += module.basePrice * 1.5;
+      monthlyPrice += module.basePrice * 0.15;
+    } else if (module.complexity === 'complex') {
+      implementationPrice += module.basePrice * 2.5;
+      monthlyPrice += module.basePrice * 0.2;
     }
   });
 
-  state.selectedAIFeatures.forEach(feature => {
-    const aiFeature = aiFeatures.find(ai => ai.name === feature);
-    implementationTotal += aiFeature?.value || 0;
-  });
-
-  if (state.selectedAITraining) {
-    const aiTrainingItem = aiTraining.find(t => t.name === state.selectedAITraining);
-    implementationTotal += aiTrainingItem?.value || 0;
+  // Add AI costs if applicable
+  if (state.selectedAILevel === 'Basic') {
+    implementationPrice += 2000;
+    monthlyPrice += 200;
+  } else if (state.selectedAILevel === 'Intermediate') {
+    implementationPrice += 5000;
+    monthlyPrice += 500;
+  } else if (state.selectedAILevel === 'Advanced') {
+    implementationPrice += 10000;
+    monthlyPrice += 1000;
   }
 
-  state.selectedAITools.forEach(tool => {
-    const aiTool = aiTools.find(t => t.name === tool);
-    implementationTotal += aiTool?.value || 0;
-  });
-
-  originalImplementation = implementationTotal;
-  
-  monthlyTotal = originalImplementation * 0.20;
-
-  const discountMultiplier = 1 - (state.discount / 100);
-  implementationTotal *= discountMultiplier;
-
-  const discountAmount = originalImplementation - implementationTotal;
+  // Apply discount if any
+  if (state.discount > 0) {
+    implementationPrice = implementationPrice * (1 - state.discount / 100);
+    monthlyPrice = monthlyPrice * (1 - state.discount / 100);
+  }
 
   return {
-    implementation: implementationTotal,
-    monthly: monthlyTotal,
-    originalImplementation: originalImplementation,
-    discountAmount: discountAmount
+    implementation: Math.round(implementationPrice),
+    monthly: Math.round(monthlyPrice)
   };
 };
 
+// Generate module scope description
 export const generateModuleScope = (state: CalculatorState): ModuleScope[] => {
-  const scope: ModuleScope[] = [];
-  
-  state.selectedModules.forEach(module => {
-    const complexity = module.complexity || 'normal';
-    const levelLabel = complexity === 'easy' ? 'Básico' : complexity === 'normal' ? 'Intermediário' : 'Avançado';
+  return state.selectedModules.map(module => {
+    let description = "";
     
-    let description = '';
-    
-    switch (module.name) {
-      case "WhatsApp":
-        description = complexity === 'easy' 
-          ? "Chatbot simples para atendimento automático com respostas pré-definidas."
-          : complexity === 'normal'
-          ? "Chatbot intermediário com fluxos de conversação e integração com base de conhecimento."
-          : "Chatbot avançado com IA para atendimento personalizado e resolução de problemas complexos.";
+    switch (module.complexity) {
+      case 'easy':
+        description = "Implementação básica com funcionalidades essenciais";
         break;
-      case "Disparador de Mensagens / Captação":
-        description = complexity === 'easy'
-          ? "Sistema básico de envio de mensagens para listas segmentadas."
-          : complexity === 'normal'
-          ? "Sistema intermediário com automação de campanhas e monitoramento de resultados."
-          : "Sistema avançado com multicanais, segmentação comportamental e análise preditiva.";
+      case 'normal':
+        description = "Implementação intermediária com funcionalidades personalizadas";
         break;
-      case "Banco de Dados":
-        description = complexity === 'easy'
-          ? "Estrutura básica para armazenamento e consulta de dados dos clientes."
-          : complexity === 'normal'
-          ? "Sistema intermediário com relacionamentos entre dados e dashboards analíticos."
-          : "Sistema avançado com big data, análise comportamental e predição de tendências.";
-        break;
-      case "IA Avançada & Prompt Studio":
-        description = complexity === 'easy'
-          ? "Interface básica para criação e teste de prompts de IA."
-          : complexity === 'normal'
-          ? "Editor avançado de prompts com templates e bibliotecas de comandos pré-definidos."
-          : "Plataforma completa de desenvolvimento de IA com fine-tuning e adaptação de modelos.";
-        break;
-      case "Integração ERP":
-        description = complexity === 'easy'
-          ? "Conexão básica para sincronização de dados com seu ERP."
-          : complexity === 'normal'
-          ? "Integração intermediária com sincronização bidirecional e automações."
-          : "Integração avançada com processamento em tempo real e workflows complexos.";
-        break;
-      case "Integração CRM":
-        description = complexity === 'easy'
-          ? "Conexão básica para sincronização de dados de clientes com seu CRM."
-          : complexity === 'normal'
-          ? "Integração intermediária com tracking de interações e histórico de atendimento."
-          : "Integração avançada com customer journey, scoring de leads e automação de vendas.";
-        break;
-      case "RAG / Base de Conhecimento":
-        description = complexity === 'easy'
-          ? "Base de conhecimento simples para consulta de informações frequentes."
-          : complexity === 'normal'
-          ? "Sistema intermediário com categorização, busca semântica e atualizações."
-          : "Sistema avançado com aprendizado contínuo e personalização por contexto.";
-        break;
-      case "Google Drive Connector":
-        description = complexity === 'easy'
-          ? "Conexão básica para acesso e compartilhamento de arquivos do Google Drive."
-          : complexity === 'normal'
-          ? "Integração intermediária com workflows de aprovação e controle de versões."
-          : "Integração avançada com automação de documentos e processamento inteligente.";
-        break;
-      case "Análise de Dados + Dashboard":
-        description = complexity === 'easy'
-          ? "Dashboard básico com métricas principais e gráficos simples."
-          : complexity === 'normal'
-          ? "Dashboard intermediário com KPIs personalizados e visualizações interativas."
-          : "Plataforma avançada de Business Intelligence com análises preditivas e insights.";
-        break;
-      case "Lembretes & Automação Follow-up":
-        description = complexity === 'easy'
-          ? "Sistema básico de lembretes e follow-ups manuais."
-          : complexity === 'normal'
-          ? "Sistema intermediário com automação de sequências de follow-up e agendamento."
-          : "Sistema avançado com gatilhos comportamentais e personalização contextual.";
+      case 'complex':
+        description = "Implementação avançada com alto nível de personalização";
         break;
       default:
-        description = "Funcionalidades personalizadas de acordo com a complexidade selecionada.";
+        description = "Nível de complexidade não definido";
     }
     
-    scope.push({
+    return {
       module: module.name,
-      level: levelLabel,
-      description: description
-    });
+      level: module.complexity || "Não definido",
+      description
+    };
   });
-  
-  return scope;
 };
 
+// Generate deliverables list
 export const generateDeliverables = (state: CalculatorState): string[] => {
-  const deliverables: string[] = [
-    "Plataforma de Automação TARS AI personalizada",
-    "Configuração e implementação dos módulos selecionados",
-    "Integração entre os módulos e sistemas existentes",
-    "Documentação técnica e manual do usuário"
+  const deliverables = [
+    "Sistema web responsivo",
+    "Dashboard administrativo",
+    "Manual do usuário",
+    "Treinamento da equipe"
   ];
   
-  if (state.selectedModules.some(m => m.name === "WhatsApp")) {
-    deliverables.push("Chatbot WhatsApp configurado e treinado");
+  if (state.selectedAILevel) {
+    deliverables.push("Módulos de inteligência artificial");
   }
   
-  if (state.selectedModules.some(m => m.name === "Banco de Dados")) {
-    deliverables.push("Estrutura de banco de dados otimizada para seu negócio");
+  if (state.selectedModules.some(m => m.name === "CRM")) {
+    deliverables.push("Sistema de gerenciamento de relacionamento com clientes");
   }
   
-  if (state.selectedModules.some(m => m.name === "Análise de Dados + Dashboard")) {
-    deliverables.push("Dashboard personalizado com as principais métricas");
+  if (state.selectedModules.some(m => m.name === "ERP")) {
+    deliverables.push("Sistema integrado de gestão empresarial");
   }
-  
-  if (state.selectedAIFeatures.length > 0) {
-    deliverables.push("Modelos de IA treinados para seus objetivos específicos");
-  }
-  
-  if (state.selectedAITraining) {
-    deliverables.push(`${state.selectedAITraining} para sua equipe`);
-  }
-  
-  if (state.selectedSegment) {
-    deliverables.push(`Solução personalizada para o segmento de ${state.selectedSegment}`);
-  }
-  
-  deliverables.push("30 dias de suporte pós-implementação");
-  deliverables.push("Garantia de satisfação e resultados");
   
   return deliverables;
 };
 
+// Generate business value propositions
 export const generateBusinessValue = (state: CalculatorState): string[] => {
-  const businessValues: string[] = [];
+  const values = [
+    "Aumento de produtividade da equipe",
+    "Redução de custos operacionais",
+    "Melhor gestão de informações"
+  ];
   
-  if (state.selectedObjectives.includes("Aumentar Vendas")) {
-    businessValues.push("Aumento potencial de 25-40% na conversão de leads em vendas através da automação inteligente do processo comercial.");
+  if (state.selectedAILevel === "Advanced") {
+    values.push("Insights avançados com inteligência artificial");
+    values.push("Automação de processos complexos");
   }
   
-  if (state.selectedObjectives.includes("Reduzir Custos")) {
-    businessValues.push("Redução de até 35% em custos operacionais através da eliminação de tarefas manuais e repetitivas.");
+  if (state.selectedModules.some(m => m.name === "Analytics")) {
+    values.push("Tomada de decisão baseada em dados");
   }
   
-  if (state.selectedObjectives.includes("Melhorar Experiência")) {
-    businessValues.push("Aumento médio de 30% na satisfação dos clientes com atendimento consistente e personalizado 24/7.");
-  }
-  
-  if (state.selectedObjectives.includes("Otimizar Tempo")) {
-    businessValues.push("Redução média de 60% no tempo gasto em tarefas administrativas, liberando sua equipe para atividades estratégicas.");
-  }
-  
-  if (state.selectedObjectives.includes("Inteligência Estratégica")) {
-    businessValues.push("Acesso a insights acionáveis baseados em dados para tomada de decisão mais precisa e estratégica.");
-  }
-  
-  if (state.selectedSegment === "Varejo") {
-    businessValues.push("Aumento na retenção de clientes e valor médio de ticket através de comunicação personalizada e recorrente.");
-  } else if (state.selectedSegment === "Saúde") {
-    businessValues.push("Otimização do agendamento e redução de no-shows em até 40% através de lembretes automatizados.");
-  } else if (state.selectedSegment === "E-commerce") {
-    businessValues.push("Redução de até 30% na taxa de abandono de carrinho através de recuperação automatizada.");
-  }
-  
-  businessValues.push("ROI projetado em 3-6 meses após implementação completa da solução.");
-  
-  return businessValues;
+  return values;
 };
 
-export const generateImplementationTimeline = (state: CalculatorState): Timeline => {
-  let totalDays = 0;
-  const tasks: Task[] = [];
-
-  if (state.selectedModules.length > 0) {
-    tasks.push({
-      phase: "Configuração de Módulos",
+// Generate implementation timeline
+export const generateImplementationTimeline = (state: CalculatorState): ImplementationTimeline => {
+  const tasks: ImplementationTask[] = [
+    {
+      phase: "Levantamento de requisitos",
       days: 10,
-      description: `Configuração e integração dos módulos selecionados: ${state.selectedModules.map(m => m.name).join(", ")}.`
-    });
-    totalDays += 10;
-  }
-
-  if (state.selectedAIFeatures.length > 0) {
-    tasks.push({
-      phase: "Implementação de IA",
+      description: "Análise detalhada das necessidades e processos"
+    },
+    {
+      phase: "Design e prototipação",
       days: 15,
-      description: `Implementação dos recursos de IA: ${state.selectedAIFeatures.join(", ")}.`
-    });
-    totalDays += 15;
-  }
-
-  if (state.selectedAITraining) {
+      description: "Criação de interfaces e fluxos de usuário"
+    },
+    {
+      phase: "Desenvolvimento",
+      days: 30,
+      description: "Codificação e integração dos módulos"
+    }
+  ];
+  
+  // Add more days for complex implementations
+  const complexModules = state.selectedModules.filter(m => m.complexity === "complex");
+  if (complexModules.length > 0) {
     tasks.push({
-      phase: "Treinamento de IA",
-      days: 7,
-      description: `Treinamento e ajuste do modelo de IA com ${state.selectedAITraining}.`
+      phase: "Desenvolvimento avançado",
+      days: 20 * complexModules.length,
+      description: `Implementação de ${complexModules.length} módulos complexos`
     });
-    totalDays += 7;
   }
-
+  
+  // Add AI setup time if applicable
+  if (state.selectedAILevel) {
+    tasks.push({
+      phase: "Configuração de IA",
+      days: state.selectedAILevel === "Advanced" ? 20 : 10,
+      description: `Configuração e treinamento de modelos de IA ${state.selectedAILevel}`
+    });
+  }
+  
   tasks.push({
-    phase: "Testes e Ajustes",
+    phase: "Testes e validação",
+    days: 15,
+    description: "Testes de qualidade e validação com usuários"
+  });
+  
+  tasks.push({
+    phase: "Implantação",
     days: 5,
-    description: "Fase de testes e ajustes finos para garantir a qualidade da solução."
+    description: "Lançamento e configuração em ambiente de produção"
   });
-  totalDays += 5;
-
+  
+  // Calculate total days
+  const totalDays = tasks.reduce((sum, task) => sum + task.days, 0);
+  
   return {
-    totalDays: totalDays,
-    tasks: tasks
+    tasks,
+    totalDays
   };
-};
-
-export const generateCommercialProposal = (state: CalculatorState): string => {
-  const totalPrice = calculateTotalPrice(state);
-  const timeline = generateImplementationTimeline(state);
-
-  let proposal = `Proposta Comercial\n\n`;
-  proposal += `Cliente: ${state.clientName}\n`;
-  proposal += `Empresa: ${state.companyName}\n`;
-  proposal += `Telefone: ${state.clientPhone}\n\n`;
-  proposal += `Descrição do Projeto: ${state.projectDescription}\n\n`;
-  proposal += `Escopo:\n`;
-  proposal += `- Nicho: ${state.selectedNiche} (${state.nicheUnits} unidades)\n`;
-  if (state.selectedIndustryArea) {
-    proposal += `- Área da Indústria: ${state.selectedIndustryArea}\n`;
-  }
-  proposal += `- Objetivos: ${state.selectedObjectives.join(", ")}\n`;
-  proposal += `- Recursos de IA: ${state.selectedAIFeatures.join(", ")}\n`;
-  if (state.selectedAITraining) {
-    proposal += `- Treinamento de IA: ${state.selectedAITraining}\n`;
-  }
-  proposal += `- Módulos: ${state.selectedModules.map(m => m.name).join(", ")}\n\n`;
-  proposal += `Cronograma de Implementação:\n`;
-  timeline.tasks.forEach(task => {
-    proposal += `- ${task.phase}: ${task.days} dias - ${task.description}\n`;
-  });
-  proposal += `\nInvestimento:\n`;
-  proposal += `- Implementação: R$ ${totalPrice.implementation.toLocaleString('pt-BR')}\n`;
-  proposal += `- Mensalidade: R$ ${totalPrice.monthly.toLocaleString('pt-BR')}\n\n`;
-  proposal += `Observações: ${state.notes}\n`;
-
-  return proposal;
-};
-
-export const getSubNichesBySegment = (segment: Segment): { name: SubNiche; basePrice: number; departments: Department[] }[] => {
-  const foundSegment = segmentData.find(s => s.name === segment);
-  return foundSegment ? foundSegment.subNiches : [];
-};
-
-export const getDepartmentsBySubNiche = (segment: Segment, subNiche: SubNiche): Department[] => {
-  const foundSegment = segmentData.find(s => s.name === segment);
-  const subNicheData = foundSegment?.subNiches?.find(sn => sn.name === subNiche);
-  return subNicheData ? subNicheData.departments : [];
-};
-
-export const getAvailableModules = (department: Department): string[] => {
-  const availableModules = modulesData
-    .filter(module => module.departmentAvailability[department])
-    .map(module => module.name);
-  return availableModules;
 };
