@@ -1,3 +1,4 @@
+
 export type BusinessNiche =
   | "Saúde"
   | "Varejo"
@@ -61,3 +62,22 @@ export type Segment =
 
 export type SubNiche = string;
 export type Department = string;
+
+// Estes são os elementos que faltam do arquivo original e estavam causando erros
+export const businessNiches = [
+  { name: "Saúde" as BusinessNiche, basePrice: 2500 },
+  { name: "Varejo" as BusinessNiche, basePrice: 3000 },
+  { name: "E-commerce" as BusinessNiche, basePrice: 3500 },
+  { name: "Franquias" as BusinessNiche, basePrice: 4000 },
+  { name: "Indústria" as BusinessNiche, basePrice: 5000 },
+  { name: "Serviços" as BusinessNiche, basePrice: 2800 }
+];
+
+export const segmentData = [
+  { id: "saude", name: "Saúde" as Segment, icon: "HeartPulse" },
+  { id: "construcao", name: "Construção Civil" as Segment, icon: "Building" },
+  { id: "ecommerce", name: "E-commerce" as Segment, icon: "ShoppingCart" },
+  { id: "industria", name: "Indústria" as Segment, icon: "Factory" },
+  { id: "servicos", name: "Serviços" as Segment, icon: "Settings" },
+  { id: "varejo", name: "Varejo" as Segment, icon: "Store" },
+];
