@@ -1,6 +1,6 @@
 
 import { cn } from "@/lib/utils";
-import { Department, Module, ModuleData, ModuleLevel, ModuleName, modulesData, getAvailableModules } from "@/types/calculator";
+import { Department, Module, modulesData, ModuleLevel, ModuleName, getAvailableModules } from "@/types/calculator";
 import { useState } from "react";
 import { Check, Database, MessageSquare, LayoutDashboard, Brain, FileText, BellRing, Code, Cloud } from "lucide-react";
 
@@ -125,7 +125,7 @@ const ModuleSelector = ({
                         )}
                       >
                         <span>{level === 'I' ? 'Iniciante' : level === 'M' ? 'Intermediário' : 'Avançado'}</span>
-                        <span className="text-xs mt-1">R$ {module.prices[level].toLocaleString('pt-BR')}</span>
+                        <span className="text-xs mt-1">R$ {(module.prices as any)[level.toLowerCase()].toLocaleString('pt-BR')}</span>
                       </div>
                     ))}
                   </div>

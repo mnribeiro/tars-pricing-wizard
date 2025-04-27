@@ -1,5 +1,5 @@
 
-import { AITraining, AIFeature, AITool, AILevel, IndustryArea, ModuleName } from "./enums";
+import { AITraining, AIFeature, AITool, AILevel, IndustryArea, ModuleName, Segment, SubNiche } from "./enums";
 
 export const segmentsData = [
   {
@@ -54,16 +54,16 @@ export const segmentsData = [
   }
 ];
 
-export const industryAreas: IndustryArea[] = [
-  "Alimentos e Bebidas",
-  "Automotiva",
-  "Eletrônicos",
-  "Farmacêutica",
-  "Moda e Vestuário",
-  "Móveis",
-  "Química",
-  "Construção",
-  "Energia"
+export const industryAreas: { id: string; name: IndustryArea }[] = [
+  { id: "1", name: "Alimentos e Bebidas" },
+  { id: "2", name: "Automotiva" },
+  { id: "3", name: "Eletrônicos" },
+  { id: "4", name: "Farmacêutica" },
+  { id: "5", name: "Moda e Vestuário" },
+  { id: "6", name: "Móveis" },
+  { id: "7", name: "Química" },
+  { id: "8", name: "Construção" },
+  { id: "9", name: "Energia" }
 ];
 
 export const aiLevels: AILevel[] = [
@@ -101,13 +101,13 @@ export const aiLevelThresholds = {
   intermediate: { max: 5000 }
 };
 
-export const automationObjectives: { value: string; label: string }[] = [
-  { value: "ReducaoCustos", label: "Redução de Custos" },
-  { value: "AumentoEficiencia", label: "Aumento de Eficiência" },
-  { value: "MelhoriaNaQualidade", label: "Melhoria na Qualidade" },
-  { value: "ExpandirOperacoes", label: "Expandir Operações" },
-  { value: "OtimizarProcessos", label: "Otimizar Processos" }
-];
+export const automationObjectives = [
+  "ReducaoCustos",
+  "AumentoEficiencia",
+  "MelhoriaNaQualidade",
+  "ExpandirOperacoes",
+  "OtimizarProcessos"
+] as AutomationObjective[];
 
 export const defaultModules: { name: ModuleName; basePrice: number }[] = [
   { name: "CRM", basePrice: 5000 },
@@ -133,5 +133,22 @@ export const modulesData: {
     prices: { easy: 5000, normal: 7500, complex: 12500 },
     departmentAvailability: { "Marketing": true, "Vendas": true }
   },
-  // Add more module data as needed
+  {
+    name: "ERP", 
+    basePrice: 10000,
+    prices: { easy: 10000, normal: 15000, complex: 25000 },
+    departmentAvailability: { "Financeiro": true, "Operações": true }
+  },
+  {
+    name: "WhatsApp", 
+    basePrice: 3000,
+    prices: { easy: 3000, normal: 4500, complex: 7500 },
+    departmentAvailability: { "Marketing": true, "Vendas": true, "Atendimento": true }
+  },
+  {
+    name: "Análise de Dados + Dashboard", 
+    basePrice: 4000,
+    prices: { easy: 4000, normal: 6000, complex: 10000 },
+    departmentAvailability: { "Marketing": true, "Vendas": true, "Financeiro": true, "RH": true, "Operações": true }
+  }
 ];

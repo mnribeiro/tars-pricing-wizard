@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { calculateTotalPrice, generateModuleScope, generateDeliverables, generateBusinessValue, generateImplementationTimeline } from "@/types/calculator";
 import { Button } from "@/components/ui/button";
@@ -20,15 +19,11 @@ const SummaryAndProposal = ({ state, updateField, className }) => {
   const componentRef = useRef(null);
 
   const handleGeneratePdf = useReactToPrint({
-    documentTitle: 'Proposta Comercial',
-    onBeforeGetContent: () => {
-      setIsPdfGenerating(true);
-      return Promise.resolve();
-    },
-    onAfterPrint: () => {
-      setIsPdfGenerating(false);
-    },
     content: () => componentRef.current,
+    documentTitle: 'Proposta Comercial',
+    onPrintError: (error) => console.error('Print failed', error),
+    onBeforePrint: () => setIsPdfGenerating(true),
+    onAfterPrint: () => setIsPdfGenerating(false),
   });
 
   const handleSaveProposal = async () => {
@@ -231,7 +226,7 @@ const SummaryAndProposal = ({ state, updateField, className }) => {
         </Button>
 
         <Button
-          onClick={() => handleGeneratePdf()}
+          onClick={handleGeneratePdf}
           disabled={isPdfGenerating}
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >

@@ -1,5 +1,6 @@
 
 import { AIFeature, AILevel, AITool, AITraining, Module, ModuleName } from './enums';
+import { CalculatorState } from './calculator-state';
 
 export interface Price {
   I: number;

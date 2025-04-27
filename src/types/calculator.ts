@@ -7,3 +7,4 @@ export * from './timeline';
 export * from './deliverables';
 export * from './module-scope';
 export * from './constants';
+export * from './utils';
