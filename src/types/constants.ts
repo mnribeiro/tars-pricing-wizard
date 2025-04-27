@@ -1,5 +1,5 @@
 
-import { AIFeature, AILevel, AITool, AITraining, Department, IndustryArea, ModuleName, Segment, SubNiche } from "./enums";
+import { AITraining, AIFeature, AITool, AILevel, IndustryArea, ModuleName } from "./enums";
 
 export const segmentsData = [
   {
@@ -68,33 +68,38 @@ export const industryAreas: IndustryArea[] = [
 
 export const aiLevels: AILevel[] = [
   "Basic",
-  "Intermediate",
+  "Intermediate", 
   "Advanced"
 ];
 
-export const aiFeatures: AIFeature[] = [
-  "Chatbot",
-  "Recomendações",
-  "Processamento de Texto",
-  "Visão Computacional",
-  "Previsão de Dados",
-  "Automação"
+export const aiFeatures: { name: AIFeature; value: number }[] = [
+  { name: "Chatbot", value: 500 },
+  { name: "Recomendações", value: 750 },
+  { name: "Processamento de Texto", value: 1000 },
+  { name: "Visão Computacional", value: 1250 },
+  { name: "Previsão de Dados", value: 1500 },
+  { name: "Automação", value: 1750 }
 ];
 
-export const aiTrainingOptions: AITraining[] = [
-  "Treinamento Básico",
-  "Treinamento Personalizado",
-  "Treinamento Avançado"
+export const aiTraining: { name: AITraining; value: number }[] = [
+  { name: "Treinamento Básico", value: 1000 },
+  { name: "Treinamento Personalizado", value: 2500 },
+  { name: "Treinamento Avançado", value: 5000 }
 ];
 
-export const aiTools: AITool[] = [
-  "OpenAI",
-  "TensorFlow",
-  "PyTorch",
-  "IBM Watson",
-  "Google AI",
-  "Amazon AI"
+export const aiTools: { name: AITool; value: number }[] = [
+  { name: "OpenAI", value: 1500 },
+  { name: "TensorFlow", value: 1750 },
+  { name: "PyTorch", value: 2000 },
+  { name: "IBM Watson", value: 2250 },
+  { name: "Google AI", value: 2500 },
+  { name: "Amazon AI", value: 2750 }
 ];
+
+export const aiLevelThresholds = {
+  simple: { max: 2000 },
+  intermediate: { max: 5000 }
+};
 
 export const automationObjectives: { value: string; label: string }[] = [
   { value: "ReducaoCustos", label: "Redução de Custos" },
@@ -114,4 +119,19 @@ export const defaultModules: { name: ModuleName; basePrice: number }[] = [
   { name: "Estoque", basePrice: 4500 },
   { name: "Produção", basePrice: 8000 },
   { name: "Marketing", basePrice: 5500 }
+];
+
+export const modulesData: { 
+  name: ModuleName; 
+  basePrice: number; 
+  prices: { easy: number; normal: number; complex: number };
+  departmentAvailability: { [department: string]: boolean }
+}[] = [
+  {
+    name: "CRM", 
+    basePrice: 5000,
+    prices: { easy: 5000, normal: 7500, complex: 12500 },
+    departmentAvailability: { "Marketing": true, "Vendas": true }
+  },
+  // Add more module data as needed
 ];

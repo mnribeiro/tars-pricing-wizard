@@ -6,15 +6,4 @@ export * from './pricing';
 export * from './timeline';
 export * from './deliverables';
 export * from './module-scope';
-
-// Export constants from constants file
-export {
-  aiFeatures,
-  aiTraining,
-  aiTools,
-  aiLevelThresholds,
-  modulesData,
-  automationObjectives,
-  defaultModules,
-  industryAreas
-} from './constants';
+export * from './constants';

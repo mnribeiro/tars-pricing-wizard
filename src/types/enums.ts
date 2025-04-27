@@ -1,4 +1,3 @@
-
 export type BusinessNiche =
   | "Saúde"
   | "Varejo"
@@ -107,7 +106,6 @@ export type Segment =
 export type SubNiche = string;
 export type Department = string;
 
-// Estes são os elementos que faltam do arquivo original e estavam causando erros
 export const businessNiches = [
   { name: "Saúde" as BusinessNiche, basePrice: 2500 },
   { name: "Varejo" as BusinessNiche, basePrice: 3000 },
@@ -126,3 +124,10 @@ export const segmentData = [
   { id: "varejo", name: "Varejo" as Segment, icon: "Store" },
 ];
 
+export interface Module {
+  name: ModuleName;
+  basePrice: number;
+  level?: ModuleLevel;
+  available?: boolean;
+  complexity?: ComplexityLevel;
+}
