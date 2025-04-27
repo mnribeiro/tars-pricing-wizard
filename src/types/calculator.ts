@@ -115,6 +115,8 @@ export interface Timeline {
 export interface TotalPrice {
   implementation: number;
   monthly: number;
+  originalImplementation: number;
+  discountAmount: number;
 }
 
 export interface AIData {
@@ -531,6 +533,7 @@ export const availableModules = modulesData.map(module => module.name);
 export const calculateTotalPrice = (state: CalculatorState): TotalPrice => {
   let implementationTotal = 0;
   let monthlyTotal = 0;
+  let originalImplementation = 0;
 
   // Calcula o preço base do nicho
   if (state.selectedNiche) {
@@ -565,18 +568,198 @@ export const calculateTotalPrice = (state: CalculatorState): TotalPrice => {
     implementationTotal += aiTool?.value || 0;
   });
 
+  // Guarda o valor original antes do desconto
+  originalImplementation = implementationTotal;
+  
   // Calcula a mensalidade como 20% do custo de implementação
-  monthlyTotal = implementationTotal * 0.20;
+  monthlyTotal = originalImplementation * 0.20;
 
   // Aplica o desconto, se houver
   const discountMultiplier = 1 - (state.discount / 100);
   implementationTotal *= discountMultiplier;
-  monthlyTotal *= discountMultiplier;
+
+  // Calcula o valor do desconto
+  const discountAmount = originalImplementation - implementationTotal;
 
   return {
     implementation: implementationTotal,
-    monthly: monthlyTotal
+    monthly: monthlyTotal,
+    originalImplementation: originalImplementation,
+    discountAmount: discountAmount
   };
+};
+
+export const generateModuleScope = (state: CalculatorState): ModuleScope[] => {
+  const scope: ModuleScope[] = [];
+  
+  state.selectedModules.forEach(module => {
+    const complexity = module.complexity || 'normal';
+    const levelLabel = complexity === 'easy' ? 'Básico' : complexity === 'normal' ? 'Intermediário' : 'Avançado';
+    
+    let description = '';
+    
+    switch (module.name) {
+      case "WhatsApp":
+        description = complexity === 'easy' 
+          ? "Chatbot simples para atendimento automático com respostas pré-definidas."
+          : complexity === 'normal'
+          ? "Chatbot intermediário com fluxos de conversação e integração com base de conhecimento."
+          : "Chatbot avançado com IA para atendimento personalizado e resolução de problemas complexos.";
+        break;
+      case "Disparador de Mensagens / Captação":
+        description = complexity === 'easy'
+          ? "Sistema básico de envio de mensagens para listas segmentadas."
+          : complexity === 'normal'
+          ? "Sistema intermediário com automação de campanhas e monitoramento de resultados."
+          : "Sistema avançado com multicanais, segmentação comportamental e análise preditiva.";
+        break;
+      case "Banco de Dados":
+        description = complexity === 'easy'
+          ? "Estrutura básica para armazenamento e consulta de dados dos clientes."
+          : complexity === 'normal'
+          ? "Sistema intermediário com relacionamentos entre dados e dashboards analíticos."
+          : "Sistema avançado com big data, análise comportamental e predição de tendências.";
+        break;
+      case "IA Avançada & Prompt Studio":
+        description = complexity === 'easy'
+          ? "Interface básica para criação e teste de prompts de IA."
+          : complexity === 'normal'
+          ? "Editor avançado de prompts com templates e bibliotecas de comandos pré-definidos."
+          : "Plataforma completa de desenvolvimento de IA com fine-tuning e adaptação de modelos.";
+        break;
+      case "Integração ERP":
+        description = complexity === 'easy'
+          ? "Conexão básica para sincronização de dados com seu ERP."
+          : complexity === 'normal'
+          ? "Integração intermediária com sincronização bidirecional e automações."
+          : "Integração avançada com processamento em tempo real e workflows complexos.";
+        break;
+      case "Integração CRM":
+        description = complexity === 'easy'
+          ? "Conexão básica para sincronização de dados de clientes com seu CRM."
+          : complexity === 'normal'
+          ? "Integração intermediária com tracking de interações e histórico de atendimento."
+          : "Integração avançada com customer journey, scoring de leads e automação de vendas.";
+        break;
+      case "RAG / Base de Conhecimento":
+        description = complexity === 'easy'
+          ? "Base de conhecimento simples para consulta de informações frequentes."
+          : complexity === 'normal'
+          ? "Sistema intermediário com categorização, busca semântica e atualizações."
+          : "Sistema avançado com aprendizado contínuo e personalização por contexto.";
+        break;
+      case "Google Drive Connector":
+        description = complexity === 'easy'
+          ? "Conexão básica para acesso e compartilhamento de arquivos do Google Drive."
+          : complexity === 'normal'
+          ? "Integração intermediária com workflows de aprovação e controle de versões."
+          : "Integração avançada com automação de documentos e processamento inteligente.";
+        break;
+      case "Análise de Dados + Dashboard":
+        description = complexity === 'easy'
+          ? "Dashboard básico com métricas principais e gráficos simples."
+          : complexity === 'normal'
+          ? "Dashboard intermediário com KPIs personalizados e visualizações interativas."
+          : "Plataforma avançada de Business Intelligence com análises preditivas e insights.";
+        break;
+      case "Lembretes & Automação Follow-up":
+        description = complexity === 'easy'
+          ? "Sistema básico de lembretes e follow-ups manuais."
+          : complexity === 'normal'
+          ? "Sistema intermediário com automação de sequências de follow-up e agendamento."
+          : "Sistema avançado com gatilhos comportamentais e personalização contextual.";
+        break;
+      default:
+        description = "Funcionalidades personalizadas de acordo com a complexidade selecionada.";
+    }
+    
+    scope.push({
+      module: module.name,
+      level: levelLabel,
+      description: description
+    });
+  });
+  
+  return scope;
+};
+
+export const generateDeliverables = (state: CalculatorState): string[] => {
+  const deliverables: string[] = [
+    "Plataforma de Automação TARS AI personalizada",
+    "Configuração e implementação dos módulos selecionados",
+    "Integração entre os módulos e sistemas existentes",
+    "Documentação técnica e manual do usuário"
+  ];
+  
+  // Add specific deliverables based on selected modules
+  if (state.selectedModules.some(m => m.name === "WhatsApp")) {
+    deliverables.push("Chatbot WhatsApp configurado e treinado");
+  }
+  
+  if (state.selectedModules.some(m => m.name === "Banco de Dados")) {
+    deliverables.push("Estrutura de banco de dados otimizada para seu negócio");
+  }
+  
+  if (state.selectedModules.some(m => m.name === "Análise de Dados + Dashboard")) {
+    deliverables.push("Dashboard personalizado com as principais métricas");
+  }
+  
+  // Add AI-specific deliverables
+  if (state.selectedAIFeatures.length > 0) {
+    deliverables.push("Modelos de IA treinados para seus objetivos específicos");
+  }
+  
+  if (state.selectedAITraining) {
+    deliverables.push(`${state.selectedAITraining} para sua equipe`);
+  }
+  
+  // Add segment-specific deliverables
+  if (state.selectedSegment) {
+    deliverables.push(`Solução personalizada para o segmento de ${state.selectedSegment}`);
+  }
+  
+  deliverables.push("30 dias de suporte pós-implementação");
+  deliverables.push("Garantia de satisfação e resultados");
+  
+  return deliverables;
+};
+
+export const generateBusinessValue = (state: CalculatorState): string[] => {
+  const businessValues: string[] = [];
+  
+  if (state.selectedObjectives.includes("Aumentar Vendas")) {
+    businessValues.push("Aumento potencial de 25-40% na conversão de leads em vendas através da automação inteligente do processo comercial.");
+  }
+  
+  if (state.selectedObjectives.includes("Reduzir Custos")) {
+    businessValues.push("Redução de até 35% em custos operacionais através da eliminação de tarefas manuais e repetitivas.");
+  }
+  
+  if (state.selectedObjectives.includes("Melhorar Experiência")) {
+    businessValues.push("Aumento médio de 30% na satisfação dos clientes com atendimento consistente e personalizado 24/7.");
+  }
+  
+  if (state.selectedObjectives.includes("Otimizar Tempo")) {
+    businessValues.push("Redução média de 60% no tempo gasto em tarefas administrativas, liberando sua equipe para atividades estratégicas.");
+  }
+  
+  if (state.selectedObjectives.includes("Inteligência Estratégica")) {
+    businessValues.push("Acesso a insights acionáveis baseados em dados para tomada de decisão mais precisa e estratégica.");
+  }
+  
+  // Add segment-specific values
+  if (state.selectedSegment === "Varejo") {
+    businessValues.push("Aumento na retenção de clientes e valor médio de ticket através de comunica��ão personalizada e recorrente.");
+  } else if (state.selectedSegment === "Saúde") {
+    businessValues.push("Otimização do agendamento e redução de no-shows em até 40% através de lembretes automatizados.");
+  } else if (state.selectedSegment === "E-commerce") {
+    businessValues.push("Redução de até 30% na taxa de abandono de carrinho através de recuperação automatizada.");
+  }
+  
+  // Add universal value propositions
+  businessValues.push("ROI projetado em 3-6 meses após implementação completa da solução.");
+  
+  return businessValues;
 };
 
 export const generateImplementationTimeline = (state: CalculatorState): Timeline => {
