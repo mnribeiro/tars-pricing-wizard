@@ -1,32 +1,24 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { calculateTotalPrice, generateModuleScope, generateDeliverables, generateBusinessValue, generateImplementationTimeline } from "@/types/calculator";
 import { Button } from "@/components/ui/button";
 import { Loader2, Save, FileText } from "lucide-react";
 import { useReactToPrint } from 'react-to-print';
 import { toast } from "@/components/ui/use-toast";
 import { saveProposal } from "@/lib/saveProposal";
+import { CalculatorState } from '@/types/calculator-state';
 
-const SummaryAndProposal = ({ state, updateField, className }) => {
+interface SummaryAndProposalProps {
+  state: CalculatorState;
+  updateField: (field: string, value: any) => void;
+  className?: string;
+}
+
+const SummaryAndProposal: React.FC<SummaryAndProposalProps> = ({ state, updateField, className }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
-  
-  const totalPrice = calculateTotalPrice(state);
-  const moduleScope = generateModuleScope(state);
-  const deliverables = generateDeliverables(state);
-  const businessValue = generateBusinessValue(state);
-  const timeline = generateImplementationTimeline(state);
-  
-  const componentRef = useRef(null);
+  const componentRef = useRef<HTMLDivElement>(null);
 
-  const handleGeneratePdf = useReactToPrint({
-    content: () => componentRef.current,
-    documentTitle: 'Proposta Comercial',
-    onPrintError: (error) => console.error('Print failed', error),
-    onBeforePrint: () => setIsPdfGenerating(true),
-    onAfterPrint: () => setIsPdfGenerating(false),
-  });
-
-  const handleSaveProposal = async () => {
+  const handleSaveProposal = async (): Promise<void> => {
     setIsSaving(true);
     try {
       const result = await saveProposal(state);
@@ -53,6 +45,26 @@ const SummaryAndProposal = ({ state, updateField, className }) => {
       setIsSaving(false);
     }
   };
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    documentTitle: 'Proposta Comercial',
+    onBeforeGetContent: async () => {
+      setIsPdfGenerating(true);
+      return new Promise<void>((resolve) => {
+        resolve();
+      });
+    },
+    onAfterPrint: () => {
+      setIsPdfGenerating(false);
+    },
+  });
+
+  const handlePrintClick = useCallback(() => {
+    if (handlePrint) {
+      handlePrint();
+    }
+  }, [handlePrint]);
 
   const renderModuleScope = () => (
     <div className="mb-4">
@@ -105,15 +117,19 @@ const SummaryAndProposal = ({ state, updateField, className }) => {
     </div>
   );
 
+  const totalPrice = calculateTotalPrice(state);
+  const moduleScope = generateModuleScope(state);
+  const deliverables = generateDeliverables(state);
+  const businessValue = generateBusinessValue(state);
+  const timeline = generateImplementationTimeline(state);
+
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="space-y-2">
         <h2 className="text-2xl font-bold">Resumo da Proposta</h2>
         <p className="text-muted-foreground">Confira os detalhes da proposta antes de salvar ou gerar o PDF.</p>
       </div>
 
-      {/* Proposal Content */}
       <div className="border rounded-md p-4" ref={componentRef}>
         <h2 className="text-xl font-semibold mb-4">Informações do Cliente</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -205,7 +221,6 @@ const SummaryAndProposal = ({ state, updateField, className }) => {
         {renderImplementationTimeline()}
       </div>
 
-      {/* Action Buttons */}
       <div className="flex flex-col gap-4">
         <Button
           onClick={handleSaveProposal}
@@ -226,7 +241,7 @@ const SummaryAndProposal = ({ state, updateField, className }) => {
         </Button>
 
         <Button
-          onClick={handleGeneratePdf}
+          onClick={handlePrintClick}
           disabled={isPdfGenerating}
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >

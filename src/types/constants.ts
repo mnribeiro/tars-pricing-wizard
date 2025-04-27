@@ -1,5 +1,14 @@
-
-import { AITraining, AIFeature, AITool, AILevel, IndustryArea, ModuleName, Segment, SubNiche } from "./enums";
+import { 
+  AITraining, 
+  AIFeature, 
+  AITool, 
+  AILevel, 
+  IndustryArea, 
+  ModuleName, 
+  Segment, 
+  SubNiche,
+  AutomationObjective 
+} from "./enums";
 
 export const segmentsData = [
   {
@@ -101,13 +110,13 @@ export const aiLevelThresholds = {
   intermediate: { max: 5000 }
 };
 
-export const automationObjectives = [
+export const automationObjectives: AutomationObjective[] = [
   "ReducaoCustos",
   "AumentoEficiencia",
   "MelhoriaNaQualidade",
   "ExpandirOperacoes",
   "OtimizarProcessos"
-] as AutomationObjective[];
+];
 
 export const defaultModules: { name: ModuleName; basePrice: number }[] = [
   { name: "CRM", basePrice: 5000 },
