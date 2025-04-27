@@ -1,6 +1,5 @@
 
-import React, { useState } from 'react';
-import { CalculatorState, ModuleScope } from "@/types/interfaces";
+import React, { useState, useRef } from 'react';
 import { calculateTotalPrice, generateModuleScope, generateDeliverables, generateBusinessValue, generateImplementationTimeline } from "@/types/calculator";
 import { Button } from "@/components/ui/button";
 import { Loader2, Save, FileText } from "lucide-react";
@@ -8,24 +7,19 @@ import { useReactToPrint } from 'react-to-print';
 import { toast } from "@/components/ui/use-toast";
 import { saveProposal } from "@/lib/saveProposal";
 
-interface SummaryAndProposalProps {
-  state: CalculatorState;
-  updateField?: (field: keyof CalculatorState, value: any) => void;
-  className?: string;
-}
-
-const SummaryAndProposal: React.FC<SummaryAndProposalProps> = ({ state, updateField, className }) => {
+const SummaryAndProposal = ({ state, updateField, className }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+  
   const totalPrice = calculateTotalPrice(state);
-  const moduleScope: ModuleScope[] = generateModuleScope(state);
+  const moduleScope = generateModuleScope(state);
   const deliverables = generateDeliverables(state);
   const businessValue = generateBusinessValue(state);
   const timeline = generateImplementationTimeline(state);
-  const componentRef = React.useRef(null);
+  
+  const componentRef = useRef(null);
 
   const handleGeneratePdf = useReactToPrint({
-    content: () => componentRef.current,
     documentTitle: 'Proposta Comercial',
     onBeforeGetContent: () => {
       setIsPdfGenerating(true);
@@ -33,7 +27,8 @@ const SummaryAndProposal: React.FC<SummaryAndProposalProps> = ({ state, updateFi
     },
     onAfterPrint: () => {
       setIsPdfGenerating(false);
-    }
+    },
+    content: () => componentRef.current,
   });
 
   const handleSaveProposal = async () => {
@@ -43,20 +38,20 @@ const SummaryAndProposal: React.FC<SummaryAndProposalProps> = ({ state, updateFi
       if (result.success) {
         toast({
           title: "Proposta salva com sucesso!",
-          description: "Os dados foram armazenados no banco de dados.",
+          description: "Os dados foram armazenados no banco de dados."
         });
       } else {
         toast({
           title: "Erro ao salvar proposta",
           description: result.error || "Ocorreu um erro ao salvar a proposta.",
-          variant: "destructive",
+          variant: "destructive"
         });
       }
     } catch (error) {
       toast({
         title: "Erro ao salvar proposta",
         description: "Ocorreu um erro inesperado ao salvar a proposta.",
-        variant: "destructive",
+        variant: "destructive"
       });
       console.error("Erro ao salvar proposta:", error);
     } finally {
@@ -117,13 +112,13 @@ const SummaryAndProposal: React.FC<SummaryAndProposalProps> = ({ state, updateFi
 
   return (
     <div className="space-y-8">
-      
+      {/* Header */}
       <div className="space-y-2">
         <h2 className="text-2xl font-bold">Resumo da Proposta</h2>
         <p className="text-muted-foreground">Confira os detalhes da proposta antes de salvar ou gerar o PDF.</p>
       </div>
 
-      
+      {/* Proposal Content */}
       <div className="border rounded-md p-4" ref={componentRef}>
         <h2 className="text-xl font-semibold mb-4">Informações do Cliente</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -160,7 +155,7 @@ const SummaryAndProposal: React.FC<SummaryAndProposalProps> = ({ state, updateFi
             <span className="font-semibold">Departamento:</span> {state.selectedDepartment}
           </div>
         </div>
-
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <span className="font-semibold">Unidades do Nicho:</span> {state.nicheUnits}
@@ -189,7 +184,9 @@ const SummaryAndProposal: React.FC<SummaryAndProposalProps> = ({ state, updateFi
         <h2 className="text-xl font-semibold mt-4 mb-4">Módulos Selecionados</h2>
         <ul>
           {state.selectedModules.map((module) => (
-            <li key={module.name}>{module.name} ({module.complexity})</li>
+            <li key={module.name}>
+              {module.name} ({module.complexity})
+            </li>
           ))}
         </ul>
 
@@ -212,9 +209,10 @@ const SummaryAndProposal: React.FC<SummaryAndProposalProps> = ({ state, updateFi
         {renderBusinessValue()}
         {renderImplementationTimeline()}
       </div>
-      
+
+      {/* Action Buttons */}
       <div className="flex flex-col gap-4">
-        <Button 
+        <Button
           onClick={handleSaveProposal}
           disabled={isSaving}
           className="bg-[#D4AF37] hover:bg-[#C4A027] text-white"
@@ -231,9 +229,9 @@ const SummaryAndProposal: React.FC<SummaryAndProposalProps> = ({ state, updateFi
             </>
           )}
         </Button>
-        
-        <Button 
-          onClick={handleGeneratePdf}
+
+        <Button
+          onClick={() => handleGeneratePdf()}
           disabled={isPdfGenerating}
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >

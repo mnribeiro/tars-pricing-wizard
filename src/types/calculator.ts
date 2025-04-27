@@ -1,8 +1,9 @@
 
-import { AIFeature, AILevel, AITool, AITraining, AutomationObjective, ComplexityLevel, Department, IndustryArea, ModuleLevel, ModuleName, Segment, SubNiche } from "./enums";
+import { AIFeature, AILevel, AITool, AITraining, AutomationObjective, ComplexityLevel, Department, IndustryArea, ModuleLevel, ModuleName, Segment, SubNiche, segmentData } from "./enums";
 import { segmentsData } from "./constants";
 
 export type { AIFeature, AILevel, AITool, AITraining, AutomationObjective, ComplexityLevel, Department, IndustryArea, ModuleLevel, ModuleName, Segment, SubNiche };
+export { segmentData, businessNiches } from './enums';
 
 export interface Module {
   name: ModuleName;
@@ -58,6 +59,10 @@ export interface TotalPrice {
   monthly: number;
 }
 
+// Export constants used by other components
+export { industryAreas, aiLevels as aiLevelsList, aiFeatures as aiFeaturesList, 
+         aiTrainingOptions, aiTools as aiToolsList, automationObjectives, defaultModules } from './constants';
+
 // Gets the subniches for a specific segment
 export const getSubNichesBySegment = (segment: Segment): { id: string; name: SubNiche }[] => {
   const foundSegment = segmentsData.find(s => s.name === segment);
@@ -91,13 +96,13 @@ export const calculateTotalPrice = (state: CalculatorState): TotalPrice => {
   });
 
   // Add AI costs if applicable
-  if (state.selectedAILevel === 'Basic') {
+  if (state.selectedAILevel === 'Basic' || state.selectedAILevel === 'IA Simples') {
     implementationPrice += 2000;
     monthlyPrice += 200;
-  } else if (state.selectedAILevel === 'Intermediate') {
+  } else if (state.selectedAILevel === 'Intermediate' || state.selectedAILevel === 'IA Intermediária') {
     implementationPrice += 5000;
     monthlyPrice += 500;
-  } else if (state.selectedAILevel === 'Advanced') {
+  } else if (state.selectedAILevel === 'Advanced' || state.selectedAILevel === 'IA Complexa') {
     implementationPrice += 10000;
     monthlyPrice += 1000;
   }
@@ -154,11 +159,15 @@ export const generateDeliverables = (state: CalculatorState): string[] => {
     deliverables.push("Módulos de inteligência artificial");
   }
   
-  if (state.selectedModules.some(m => m.name === "CRM")) {
+  const crmModules = state.selectedModules.filter(m => 
+    m.name === "CRM" || m.name === "Integração CRM");
+  if (crmModules.length > 0) {
     deliverables.push("Sistema de gerenciamento de relacionamento com clientes");
   }
   
-  if (state.selectedModules.some(m => m.name === "ERP")) {
+  const erpModules = state.selectedModules.filter(m => 
+    m.name === "ERP" || m.name === "Integração ERP");
+  if (erpModules.length > 0) {
     deliverables.push("Sistema integrado de gestão empresarial");
   }
   
@@ -173,12 +182,14 @@ export const generateBusinessValue = (state: CalculatorState): string[] => {
     "Melhor gestão de informações"
   ];
   
-  if (state.selectedAILevel === "Advanced") {
+  if (state.selectedAILevel === "Advanced" || state.selectedAILevel === "IA Complexa") {
     values.push("Insights avançados com inteligência artificial");
     values.push("Automação de processos complexos");
   }
   
-  if (state.selectedModules.some(m => m.name === "Analytics")) {
+  const analyticsModules = state.selectedModules.filter(m => 
+    m.name === "Analytics" || m.name === "Análise de Dados + Dashboard");
+  if (analyticsModules.length > 0) {
     values.push("Tomada de decisão baseada em dados");
   }
   
@@ -217,9 +228,14 @@ export const generateImplementationTimeline = (state: CalculatorState): Implemen
   
   // Add AI setup time if applicable
   if (state.selectedAILevel) {
+    let days = 10;
+    if (state.selectedAILevel === "Advanced" || state.selectedAILevel === "IA Complexa") {
+      days = 20;
+    }
+    
     tasks.push({
       phase: "Configuração de IA",
-      days: state.selectedAILevel === "Advanced" ? 20 : 10,
+      days: days,
       description: `Configuração e treinamento de modelos de IA ${state.selectedAILevel}`
     });
   }
@@ -244,3 +260,4 @@ export const generateImplementationTimeline = (state: CalculatorState): Implemen
     totalDays
   };
 };
+
