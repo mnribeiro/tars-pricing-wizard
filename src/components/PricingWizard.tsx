@@ -196,7 +196,7 @@ const PricingWizard = () => {
   return <div className="container max-w-4xl mx-auto py-8 px-4">
       <div className="mb-8">
         <div className="flex justify-center mb-6">
-          <img alt="TARS AI" src="/lovable-uploads/75fedcf6-2c1f-4b1e-aebb-f8386253fd76.jpg" className="w-48 h-48 object-contain\n" />
+          
         </div>
         <h1 className="text-3xl font-bold text-center mb-2">Calculadora de Precificação</h1>
         <p className="text-center text-gray-300">Configure sua solução personalizada</p>
