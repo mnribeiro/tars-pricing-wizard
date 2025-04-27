@@ -8,6 +8,7 @@ import ClientInfoForm from "./ClientInfoForm";
 import SummaryAndProposal from "./SummaryAndProposal";
 import { Button } from "./ui/button";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+
 const PricingWizard = () => {
   // Initialize calculator state
   const [state, setState] = useState<CalculatorState>({
@@ -16,10 +17,20 @@ const PricingWizard = () => {
     companyName: "",
     clientPhone: "",
     projectDescription: "",
+    initialIdea: "",
     selectedSegment: null,
     selectedSubNiche: null,
     selectedDepartment: null,
     selectedModules: [],
+    selectedNiche: null,
+    nicheUnits: 1,
+    selectedIndustryArea: null,
+    whatsappNumbers: 1,
+    selectedObjectives: [],
+    selectedAILevel: null,
+    selectedAIFeatures: [],
+    selectedAITraining: null,
+    selectedAITools: [],
     notes: "",
     discount: 0
   });
@@ -111,6 +122,7 @@ const PricingWizard = () => {
     setState(prev => {
       // Check if the module is already selected
       const existingIndex = prev.selectedModules.findIndex(m => m.name === module.name);
+      
       if (existingIndex >= 0) {
         // Remove module if already selected
         return {
@@ -118,10 +130,19 @@ const PricingWizard = () => {
           selectedModules: prev.selectedModules.filter(m => m.name !== module.name)
         };
       } else {
-        // Add module if not selected
+        // Add module if not selected, making sure to include the required complexity property
         return {
           ...prev,
-          selectedModules: [...prev.selectedModules, module]
+          selectedModules: [
+            ...prev.selectedModules,
+            {
+              name: module.name,
+              basePrice: module.basePrice,
+              level: module.level,
+              available: module.available,
+              complexity: null
+            }
+          ]
         };
       }
     });
@@ -249,4 +270,5 @@ const PricingWizard = () => {
       </div>
     </div>;
 };
+
 export default PricingWizard;

@@ -1,5 +1,3 @@
-import { StaticImageData } from "next/image";
-
 export type BusinessNiche =
   | "Saúde"
   | "Varejo"
@@ -40,6 +38,13 @@ export type AITool =
 
 export type ModuleLevel = "I" | "M" | "A";
 export type ComplexityLevel = "easy" | "normal" | "complex";
+
+export const complexityLevels: Record<ComplexityLevel, string> = {
+  easy: "Básico",
+  normal: "Intermediário",
+  complex: "Avançado"
+};
+
 export type ModuleName =
   | "WhatsApp"
   | "Disparador de Mensagens / Captação"
@@ -74,6 +79,7 @@ export interface Module {
   basePrice: number;
   level: ModuleLevel | null;
   available: boolean;
+  complexity?: ComplexityLevel | null;
 }
 
 export interface ModuleData {
@@ -167,6 +173,12 @@ export interface CalculatorState {
   selectedAITools: AITool[];
   notes: string;
   discount: number;
+}
+
+export interface ModuleScope {
+  module: string; 
+  level: string;
+  description: string;
 }
 
 export const aiLevelThresholds: AILevelThresholds = {
@@ -535,13 +547,11 @@ export const calculateTotalPrice = (state: CalculatorState): TotalPrice => {
   let monthlyTotal = 0;
   let originalImplementation = 0;
 
-  // Calcula o preço base do nicho
   if (state.selectedNiche) {
     const niche = businessNiches.find(n => n.name === state.selectedNiche);
     implementationTotal += (niche?.basePrice || 0) * state.nicheUnits;
   }
 
-  // Adiciona o preço dos módulos selecionados
   state.selectedModules.forEach(module => {
     const moduleData = modulesData.find(m => m.name === module.name);
 
@@ -550,35 +560,28 @@ export const calculateTotalPrice = (state: CalculatorState): TotalPrice => {
     }
   });
 
-  // Adiciona o preço dos recursos de IA selecionados
   state.selectedAIFeatures.forEach(feature => {
     const aiFeature = aiFeatures.find(ai => ai.name === feature);
     implementationTotal += aiFeature?.value || 0;
   });
 
-  // Adiciona o preço do treinamento de IA selecionado
   if (state.selectedAITraining) {
     const aiTrainingItem = aiTraining.find(t => t.name === state.selectedAITraining);
     implementationTotal += aiTrainingItem?.value || 0;
   }
 
-  // Adiciona o preço das ferramentas de IA selecionadas
   state.selectedAITools.forEach(tool => {
     const aiTool = aiTools.find(t => t.name === tool);
     implementationTotal += aiTool?.value || 0;
   });
 
-  // Guarda o valor original antes do desconto
   originalImplementation = implementationTotal;
   
-  // Calcula a mensalidade como 20% do custo de implementação
   monthlyTotal = originalImplementation * 0.20;
 
-  // Aplica o desconto, se houver
   const discountMultiplier = 1 - (state.discount / 100);
   implementationTotal *= discountMultiplier;
 
-  // Calcula o valor do desconto
   const discountAmount = originalImplementation - implementationTotal;
 
   return {
@@ -691,7 +694,6 @@ export const generateDeliverables = (state: CalculatorState): string[] => {
     "Documentação técnica e manual do usuário"
   ];
   
-  // Add specific deliverables based on selected modules
   if (state.selectedModules.some(m => m.name === "WhatsApp")) {
     deliverables.push("Chatbot WhatsApp configurado e treinado");
   }
@@ -704,7 +706,6 @@ export const generateDeliverables = (state: CalculatorState): string[] => {
     deliverables.push("Dashboard personalizado com as principais métricas");
   }
   
-  // Add AI-specific deliverables
   if (state.selectedAIFeatures.length > 0) {
     deliverables.push("Modelos de IA treinados para seus objetivos específicos");
   }
@@ -713,7 +714,6 @@ export const generateDeliverables = (state: CalculatorState): string[] => {
     deliverables.push(`${state.selectedAITraining} para sua equipe`);
   }
   
-  // Add segment-specific deliverables
   if (state.selectedSegment) {
     deliverables.push(`Solução personalizada para o segmento de ${state.selectedSegment}`);
   }
@@ -747,16 +747,14 @@ export const generateBusinessValue = (state: CalculatorState): string[] => {
     businessValues.push("Acesso a insights acionáveis baseados em dados para tomada de decisão mais precisa e estratégica.");
   }
   
-  // Add segment-specific values
   if (state.selectedSegment === "Varejo") {
-    businessValues.push("Aumento na retenção de clientes e valor médio de ticket através de comunica��ão personalizada e recorrente.");
+    businessValues.push("Aumento na retenção de clientes e valor médio de ticket através de comunicação personalizada e recorrente.");
   } else if (state.selectedSegment === "Saúde") {
     businessValues.push("Otimização do agendamento e redução de no-shows em até 40% através de lembretes automatizados.");
   } else if (state.selectedSegment === "E-commerce") {
     businessValues.push("Redução de até 30% na taxa de abandono de carrinho através de recuperação automatizada.");
   }
   
-  // Add universal value propositions
   businessValues.push("ROI projetado em 3-6 meses após implementação completa da solução.");
   
   return businessValues;
@@ -766,7 +764,6 @@ export const generateImplementationTimeline = (state: CalculatorState): Timeline
   let totalDays = 0;
   const tasks: Task[] = [];
 
-  // Adiciona tarefas baseadas nos módulos selecionados
   if (state.selectedModules.length > 0) {
     tasks.push({
       phase: "Configuração de Módulos",
@@ -776,7 +773,6 @@ export const generateImplementationTimeline = (state: CalculatorState): Timeline
     totalDays += 10;
   }
 
-  // Adiciona tarefas baseadas nos recursos de IA selecionados
   if (state.selectedAIFeatures.length > 0) {
     tasks.push({
       phase: "Implementação de IA",
@@ -786,7 +782,6 @@ export const generateImplementationTimeline = (state: CalculatorState): Timeline
     totalDays += 15;
   }
 
-  // Adiciona tarefa de treinamento de IA, se selecionado
   if (state.selectedAITraining) {
     tasks.push({
       phase: "Treinamento de IA",
@@ -796,7 +791,6 @@ export const generateImplementationTimeline = (state: CalculatorState): Timeline
     totalDays += 7;
   }
 
-  // Adiciona tarefa de testes e ajustes
   tasks.push({
     phase: "Testes e Ajustes",
     days: 5,

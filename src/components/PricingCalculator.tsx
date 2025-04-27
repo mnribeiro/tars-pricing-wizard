@@ -18,7 +18,7 @@ import {
   aiTraining,
   aiTools,
   aiLevelThresholds,
-  availableModules,
+  modulesData,
   calculateTotalPrice,
   generateImplementationTimeline,
   generateCommercialProposal,
@@ -291,7 +291,7 @@ const PricingCalculator = () => {
               basePrice, 
               level: null,
               available: true,
-              complexity: null as ComplexityLevel | null
+              complexity: null
             }
           ]
         };
@@ -704,7 +704,7 @@ const PricingCalculator = () => {
         <p className="mb-4 text-sm">Selecione os módulos que deseja incluir no projeto e defina o nível de complexidade para cada um. Os preços variam de acordo com a complexidade.</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {availableModules.map((module) => (
+          {modulesData.map((module) => (
             <div key={module.name} className="flex flex-col">
               <SelectableCard
                 title={module.name}
@@ -830,7 +830,7 @@ const PricingCalculator = () => {
               <ul className="mt-2 space-y-2">
                 {state.selectedModules.map((module) => {
                   // Obter preço do módulo baseado na complexidade
-                  const modulePricing = availableModules.find(m => m.name === module.name);
+                  const modulePricing = modulesData.find(m => m.name === module.name);
                   const price = module.complexity && modulePricing
                     ? modulePricing.prices[module.complexity]
                     : 0;

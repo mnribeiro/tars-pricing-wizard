@@ -1,6 +1,13 @@
 
-import { ComplexityLevel, complexityLevels } from "@/types/calculator";
+import { ComplexityLevel } from "@/types/calculator";
 import { cn } from "@/lib/utils";
+
+// Define the complexity levels directly here since they're missing in the calculator.ts
+const complexityLevels: Record<ComplexityLevel, string> = {
+  easy: "Básico",
+  normal: "Intermediário",
+  complex: "Avançado"
+};
 
 interface ComplexitySelectorProps {
   selected: ComplexityLevel | null;
