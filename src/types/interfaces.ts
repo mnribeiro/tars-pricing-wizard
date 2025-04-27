@@ -1,3 +1,8 @@
+import { 
+  BusinessNiche, IndustryArea, AutomationObjective, AILevel, 
+  AIFeature, AITraining, AITool, ModuleName, ModuleLevel, 
+  ComplexityLevel, Segment, SubNiche, Department 
+} from './enums';
 
 export interface Price {
   I: number;
@@ -110,4 +115,29 @@ export interface ModuleScope {
   module: string;
   level: string;
   description: string;
+}
+
+export interface Proposal {
+  id?: string;
+  client_name: string;
+  company_name: string;
+  client_phone: string;
+  project_description: string;
+  initial_idea: string;
+  selected_segment: string;
+  selected_subniche: string;
+  selected_department: string;
+  niche_units: number;
+  industry_area: string;
+  whatsapp_numbers: number;
+  objectives: string[];
+  ai_level: string;
+  ai_features: string[];
+  ai_training: string;
+  ai_tools: string[];
+  selected_modules: any;
+  notes: string;
+  discount: number;
+  implementation_price: number;
+  monthly_price: number;
 }

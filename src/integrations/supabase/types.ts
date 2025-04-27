@@ -129,6 +129,87 @@ export type Database = {
         }
         Relationships: []
       }
+      proposals: {
+        Row: {
+          ai_features: string[] | null
+          ai_level: string | null
+          ai_tools: string[] | null
+          ai_training: string | null
+          client_name: string
+          client_phone: string
+          company_name: string
+          created_at: string | null
+          discount: number | null
+          id: string
+          implementation_price: number | null
+          industry_area: string | null
+          initial_idea: string | null
+          monthly_price: number | null
+          niche_units: number | null
+          notes: string | null
+          objectives: string[] | null
+          project_description: string | null
+          selected_department: string | null
+          selected_modules: Json | null
+          selected_segment: string | null
+          selected_subniche: string | null
+          updated_at: string | null
+          whatsapp_numbers: number | null
+        }
+        Insert: {
+          ai_features?: string[] | null
+          ai_level?: string | null
+          ai_tools?: string[] | null
+          ai_training?: string | null
+          client_name: string
+          client_phone: string
+          company_name: string
+          created_at?: string | null
+          discount?: number | null
+          id?: string
+          implementation_price?: number | null
+          industry_area?: string | null
+          initial_idea?: string | null
+          monthly_price?: number | null
+          niche_units?: number | null
+          notes?: string | null
+          objectives?: string[] | null
+          project_description?: string | null
+          selected_department?: string | null
+          selected_modules?: Json | null
+          selected_segment?: string | null
+          selected_subniche?: string | null
+          updated_at?: string | null
+          whatsapp_numbers?: number | null
+        }
+        Update: {
+          ai_features?: string[] | null
+          ai_level?: string | null
+          ai_tools?: string[] | null
+          ai_training?: string | null
+          client_name?: string
+          client_phone?: string
+          company_name?: string
+          created_at?: string | null
+          discount?: number | null
+          id?: string
+          implementation_price?: number | null
+          industry_area?: string | null
+          initial_idea?: string | null
+          monthly_price?: number | null
+          niche_units?: number | null
+          notes?: string | null
+          objectives?: string[] | null
+          project_description?: string | null
+          selected_department?: string | null
+          selected_modules?: Json | null
+          selected_segment?: string | null
+          selected_subniche?: string | null
+          updated_at?: string | null
+          whatsapp_numbers?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

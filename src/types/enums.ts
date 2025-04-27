@@ -1,4 +1,3 @@
-
 export type BusinessNiche =
   | "Saúde"
   | "Varejo"

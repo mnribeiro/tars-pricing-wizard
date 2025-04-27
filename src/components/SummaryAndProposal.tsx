@@ -1,4 +1,3 @@
-
 import { CalculatorState, Module, ModuleData, calculateTotalPrice, generateImplementationTimeline, modulesData, generateModuleScope, generateDeliverables, generateBusinessValue } from "@/types/calculator";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -8,6 +7,8 @@ import { Check, Download, FileText, Calendar, Package, TrendingUp } from "lucide
 import { useState } from "react";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
+import { toast } from "@/components/ui/use-toast"
+import { saveProposal } from "@/lib/saveProposal";
 
 interface SummaryAndProposalProps {
   state: CalculatorState;
@@ -43,6 +44,32 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
     };
   };
   
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  
+  const handleSaveProposal = async () => {
+    setIsSaving(true);
+    setSaveError(null);
+    
+    const result = await saveProposal(state);
+    
+    if (result.success) {
+      toast({
+        title: "Proposta salva com sucesso!",
+        description: "A proposta foi armazenada em nosso banco de dados.",
+      });
+    } else {
+      setSaveError(result.error || 'Erro ao salvar a proposta');
+      toast({
+        title: "Erro ao salvar a proposta",
+        description: result.error,
+        variant: "destructive",
+      });
+    }
+    
+    setIsSaving(false);
+  };
+
   // Generate PDF proposal
   const generatePDF = () => {
     const doc = new jsPDF();
@@ -450,8 +477,8 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
             </div>
           </div>
           
-          {/* Generate PDF */}
-          <div className="flex justify-center mt-4">
+          {/* Generate PDF and Save buttons */}
+          <div className="flex justify-center gap-4 mt-4">
             <Button 
               onClick={generatePDF}
               className="bg-[#D4AF37] hover:bg-[#B39020] text-white"
@@ -459,7 +486,26 @@ const SummaryAndProposal = ({ state, updateField, className }: SummaryAndProposa
               <Download className="w-4 h-4 mr-2" />
               Gerar PDF
             </Button>
+            
+            <Button 
+              onClick={handleSaveProposal}
+              disabled={isSaving}
+              className="bg-[#D4AF37] hover:bg-[#B39020] text-white"
+            >
+              {isSaving ? (
+                <>Salvando...</>
+              ) : (
+                <>
+                  <save className="w-4 h-4 mr-2" />
+                  Salvar Proposta
+                </>
+              )}
+            </Button>
           </div>
+          
+          {saveError && (
+            <p className="text-red-500 text-sm mt-2 text-center">{saveError}</p>
+          )}
         </div>
       ) : (
         // Proposal View
